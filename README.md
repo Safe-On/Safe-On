@@ -45,11 +45,11 @@
       <td align="center">팀원</td>
     </tr>
     <tr>
-      <td align="center">design</td>
-      <td align="center">backend</td>
-      <td align="center">frontend</td>
-      <td align="center">frontend</td>
-      <td align="center">backend</td>
+      <td align="center">Design</td>
+      <td align="center">Backend</td>
+      <td align="center">Frontend</td>
+      <td align="center">Frontend</td>
+      <td align="center">Backend</td>
     </tr>
   </tbody>
 </table>
