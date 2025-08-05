@@ -2,10 +2,22 @@
 
 // 잠시 로그인 화면만 실행
 import React from "react";
+import { NavigationContainer } from "@react-navigation/native";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import Login from "./screens/Login";
+import Signup from "./screens/Signup";
+
+const Stack = createNativeStackNavigator();
 
 export default function App() {
-  return <Login navigation={{ navigate: () => {}, replace: () => {} }} />;
+  return (
+    <NavigationContainer>
+      <Stack.Navigator screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="Login" component={Login} />
+        <Stack.Screen name="Signup" component={Signup} />
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
 }
 
 /* 원래코드
@@ -16,12 +28,15 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import FirstScreen from "./screens/FirstScreen";
 import BottomTabNavigator from "./navigation/BottomTabNavigator";
-
+import Permission from "./screens/Permission";
+import Login from "./screens/Login";
 SplashScreen.preventAutoHideAsync();
 
 type RootStackParamList = {
   First: undefined;
   MainTabs: undefined;
+  Permission: undefined;
+  Login: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -57,6 +72,8 @@ export default function App() {
         <Stack.Navigator screenOptions={{ headerShown: false }}>
           <Stack.Screen name="First" component={FirstScreen} />
           <Stack.Screen name="MainTabs" component={BottomTabNavigator} />
+          <Stack.Screen name="Permission" component={Permission} />
+          <Stack.Screen name="Login" component={Login} />
         </Stack.Navigator>
       </NavigationContainer>
     </View>

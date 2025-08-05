@@ -132,7 +132,7 @@ export default function Login({ navigation }: { navigation: any }) {
       </Pressable>
 
       <View style={styles.row}>
-        <TouchableOpacity onPress={() => navigation.navigate("Register")}>
+        <TouchableOpacity onPress={() => navigation.navigate("Signup")}>
           <Text style={styles.linkText}>회원가입</Text>
         </TouchableOpacity>
         <Text style={styles.separator}>|</Text>

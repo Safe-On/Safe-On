@@ -9,6 +9,12 @@ type Props = NativeStackScreenProps<RootStackParamList, "First">;
 
 const FirstScreen: React.FC<Props> = ({ navigation }) => {
   useEffect(() => {
+    if (__DEV__) {
+      AsyncStorage.removeItem("PermissionAgreed");
+    }
+  }, []);
+
+  useEffect(() => {
     async function initialize() {
       try {
         const permissionAgreed = await AsyncStorage.getItem("PermissionAgreed");
