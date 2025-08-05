@@ -1,6 +1,18 @@
+// screens/home.tsx
 import React from "react";
-import { View } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 
-export default function Home() {
-  return <View></View>;
-}
+const Home: React.FC = () => {
+  return (
+    <View style={styles.container}>
+      <Text style={styles.text}>홈 화면</Text>
+    </View>
+  );
+};
+
+export default Home;
+
+const styles = StyleSheet.create({
+  container: { flex: 1, justifyContent: "center", alignItems: "center" },
+  text: { fontSize: 18 },
+});
