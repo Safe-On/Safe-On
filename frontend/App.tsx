@@ -1,4 +1,14 @@
 // App.tsx
+
+// 잠시 로그인 화면만 실행
+import React from "react";
+import Login from "./screens/Login";
+
+export default function App() {
+  return <Login navigation={{ navigate: () => {}, replace: () => {} }} />;
+}
+
+/* 원래코드
 import React, { useCallback, useEffect, useState } from "react";
 import { View } from "react-native";
 import * as SplashScreen from "expo-splash-screen";
@@ -52,3 +62,4 @@ export default function App() {
     </View>
   );
 }
+*/

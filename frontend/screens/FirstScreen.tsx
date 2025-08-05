@@ -2,11 +2,8 @@
 import React, { useEffect } from "react";
 import { View, Text, StyleSheet, ActivityIndicator, Image } from "react-native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-
-type RootStackParamList = {
-  First: undefined;
-  MainTabs: undefined;
-};
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import type { RootStackParamList } from "../navigation/AppNavigator";
 
 type Props = NativeStackScreenProps<RootStackParamList, "First">;
 
@@ -14,15 +11,14 @@ const FirstScreen: React.FC<Props> = ({ navigation }) => {
   useEffect(() => {
     async function initialize() {
       try {
-        // 실제 초기화 작업들: 예시
-        // await restoreAuthState();
-        // await fetchUserSettings();
-        await new Promise((r) => setTimeout(r, 1000)); // 예시 지연
+        const permissionAgreed = await AsyncStorage.getItem("PermissionAgreed");
+        if (permissionAgreed === "true") {
+          navigation.replace("MainTabs");
+        } else {
+          navigation.replace("Permission");
+        }
       } catch (e) {
         console.warn("초기화 오류:", e);
-      } finally {
-        // 준비 끝나면 메인 탭으로 이동 (스택을 교체)
-        navigation.replace("MainTabs");
       }
     }
     initialize();
