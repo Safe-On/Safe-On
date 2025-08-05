@@ -2,7 +2,7 @@ from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 import os
 
-app = Flask(__name__)
+app = Flask(__name__)  # test
 
 # MySQL 데이터베이스 설정
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://your_username:your_password@your_host/your_database_name'
