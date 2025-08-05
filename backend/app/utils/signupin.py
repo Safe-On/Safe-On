@@ -5,7 +5,7 @@ import os
 
 app = Flask(__name__)
 
-
+#jjjjjj
 # MySQL 데이터베이스 설정
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://your_username:your_password@your_host/your_database_name'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
