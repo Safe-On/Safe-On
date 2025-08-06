@@ -42,7 +42,7 @@ export default function Signup({ navigation }: { navigation: any }) {
 
     try {
       const response = await fetch(
-        "https://31441177bfdf.ngrok-free.app/api/signup",
+        "https://fe66c90452d7.ngrok-free.app/api/signup",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

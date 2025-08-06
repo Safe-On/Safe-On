@@ -15,6 +15,7 @@ import { useForm, Controller } from "react-hook-form";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 // import { login as apiLogin } from "../services/api"; // 백엔드 api (없으면 모킹 가능)
+console.log("Hello");
 
 export default function Login({ navigation }: { navigation: any }) {
   const {
@@ -28,7 +29,7 @@ export default function Login({ navigation }: { navigation: any }) {
   const onSubmit = async (data: { email: string; password: string }) => {
     try {
       const response = await fetch(
-        "https://31441177bfdf.ngrok-free.app/api/login",
+        "https://fe66c90452d7.ngrok-free.app/api/login",
         {
           method: "POST",
           headers: {

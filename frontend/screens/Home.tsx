@@ -17,12 +17,12 @@ import { mockWeather } from "../data/mockWeather";
 export default function Home() {
   const [rating, setRating] = useState<number>();
   const [congestion, setCongestion] = useState<string>();
-  const [climateOption, setClimateOption] = useState<"on" | "off" | null>(null); 
+  const [climateOption, setClimateOption] = useState<"on" | "off" | null>(null);
   const [accessLevel, setAccessLevel] = useState<string>();
   const [isScrolled, setIsScrolled] = useState(false);
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
       <ScrollView
         onScroll={(e) => {
           const y = e.nativeEvent.contentOffset.y;
@@ -130,7 +130,11 @@ export default function Home() {
                   style={styles.checkItem}
                 >
                   <Ionicons
-                    name={climateOption === "on"? "checkbox-outline": "square-outline"}
+                    name={
+                      climateOption === "on"
+                        ? "checkbox-outline"
+                        : "square-outline"
+                    }
                     size={24}
                     color="#34A853"
                   />
@@ -141,7 +145,11 @@ export default function Home() {
                   style={styles.checkItem}
                 >
                   <Ionicons
-                    name={ climateOption === "off" ? "close-outline" : "square-outline"}
+                    name={
+                      climateOption === "off"
+                        ? "close-outline"
+                        : "square-outline"
+                    }
                     size={24}
                     color="#EA4335"
                   />
@@ -218,7 +226,15 @@ export default function Home() {
 }
 
 /* ---------- Chip(선택 버튼) ---------- */
-const Chip = ({ label, selected = false, onPress }: {label: string; selected?: boolean; onPress:()=>void;}) => (
+const Chip = ({
+  label,
+  selected = false,
+  onPress,
+}: {
+  label: string;
+  selected?: boolean;
+  onPress: () => void;
+}) => (
   <TouchableOpacity
     style={[
       styles.chip,
@@ -234,7 +250,6 @@ const Chip = ({ label, selected = false, onPress }: {label: string; selected?: b
     </Text>
   </TouchableOpacity>
 );
-
 
 const cardBase = {
   backgroundColor: "#fff",
