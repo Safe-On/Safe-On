@@ -9,6 +9,7 @@ import type { RootStackParamList } from "../navigation/AppNavigator";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { Ionicons } from "@expo/vector-icons";
 
 const Permission: React.FC = () => {
   const navigation =
@@ -61,31 +62,47 @@ const Permission: React.FC = () => {
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
-        <Text style={styles.title}>권한 설정</Text>
+        <View style={styles.header}>
+          <Text style={styles.title}>권한 설정</Text>
+        </View>
         <View style={styles.permissionList}>
           <View style={styles.permissionItem}>
-            <Text style={styles.permissionText}>사진 권한</Text>
-            <Text style={styles.permissionDesc}>
-              사진 촬영 및 갤러리 접근을 위해 필요합니다.
-            </Text>
+            <Ionicons name="camera-outline" size={24} color="black" />
+            <View style={styles.permissionText}>
+              <Text style={styles.permissionTitle}>사진 권한</Text>
+              <Text style={styles.permissionDesc}>
+                사진 촬영 및 갤러리 접근을 위해 필요합니다.
+              </Text>
+            </View>
           </View>
           <View style={styles.permissionItem}>
-            <Text style={styles.permissionText}>위치 권한</Text>
-            <Text style={styles.permissionDesc}>
-              근처 쉼터 찾기 및 위치 기반 서비스를 위해 필요합니다.
-            </Text>
+            <View style={styles.icon}>
+              <Ionicons name="location-outline" size={24} color="black" />
+            </View>
+            <View style={styles.permissionText}>
+              <Text style={styles.permissionTitle}>위치 권한</Text>
+              <Text style={styles.permissionDesc}>
+                근처 쉼터 찾기 및 위치 기반 서비스를 위해 필요합니다.
+              </Text>
+            </View>
           </View>
           <View style={styles.permissionItem}>
-            <Text style={styles.permissionText}>알림 권한</Text>
-            <Text style={styles.permissionDesc}>
-              중요한 알람을 보내기 위해 필요합니다.
-            </Text>
+            <View style={styles.icon}>
+              <Ionicons name="notifications-outline" size={24} color="black" />
+            </View>
+            <View style={styles.permissionText}>
+              <Text style={styles.permissionTitle}>알림 권한</Text>
+              <Text style={styles.permissionDesc}>
+                중요한 알람을 보내기 위해 필요합니다.
+              </Text>
+            </View>
           </View>
         </View>
-
-        <Pressable style={styles.button} onPress={onPressAgree}>
-          <Text style={styles.buttonText}>동의</Text>
-        </Pressable>
+        <View style={styles.footerbutton}>
+          <Pressable style={styles.button} onPress={onPressAgree}>
+            <Text style={styles.buttonText}>동의합니다.</Text>
+          </Pressable>
+        </View>
       </View>
     </SafeAreaView>
   );
@@ -101,43 +118,68 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingHorizontal: 16,
-    justifyContent: "center",
+  },
+  header: {
+    flex: 0.2,
+    alignItems: "center",
   },
   title: {
+    marginTop: 30,
     fontSize: 24,
     fontWeight: "bold",
-    marginBottom: 24,
     textAlign: "center",
   },
   permissionList: {
-    marginBottom: 24,
+    flex: 0.6,
+    marginTop: 15,
   },
   permissionItem: {
     marginBottom: 16,
+    width: "100%",
     maxWidth: 400,
-    height: 60,
+    height: 75,
     borderRadius: 8,
     padding: 20,
-    backgroundColor: "#fff6eb",
+    backgroundColor: "#effaf1",
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  icon: {
+    justifyContent: "center",
+    alignItems: "center",
   },
   permissionText: {
+    marginTop: 5,
+    marginLeft: 15,
+    justifyContent: "center",
+  },
+  permissionTitle: {
     fontSize: 16,
     fontWeight: "bold",
     marginBottom: 4,
+    justifyContent: "center",
   },
   permissionDesc: {
-    fontSize: 14,
+    fontSize: 12,
     color: "#666",
   },
+  footerbutton: {
+    flex: 0.2,
+    alignItems: "center",
+    justifyContent: "center",
+  },
   button: {
-    backgroundColor: "#007AFF",
+    backgroundColor: "#34A853",
     padding: 12,
     borderRadius: 8,
     alignItems: "center",
     width: "100%",
     maxWidth: 400,
     height: 60,
+    marginBottom: -55,
+    justifyContent: "center",
   },
+
   buttonText: {
     color: "#FFFFFF",
     fontSize: 16,

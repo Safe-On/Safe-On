@@ -19,7 +19,7 @@ const FirstScreen: React.FC<Props> = ({ navigation }) => {
       try {
         const permissionAgreed = await AsyncStorage.getItem("PermissionAgreed");
         if (permissionAgreed === "true") {
-          navigation.replace("MainTabs");
+          navigation.replace("BottomTabs", undefined);
         } else {
           navigation.replace("Permission");
         }
