@@ -8,6 +8,8 @@ import {
   TouchableOpacity,
   Pressable,
   ActivityIndicator,
+  Keyboard,
+  TouchableWithoutFeedback,
 } from "react-native";
 import { useForm, Controller } from "react-hook-form";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -19,7 +21,6 @@ export default function Signup({ navigation }: { navigation: any }) {
     formState: { errors, isSubmitting },
   } = useForm({
     defaultValues: {
-      username: "",
       email: "",
       password: "",
       passwordConfirm: "",
@@ -27,7 +28,6 @@ export default function Signup({ navigation }: { navigation: any }) {
   });
 
   const onSubmit = async (data: {
-    username: string;
     email: string;
     password: string;
     passwordConfirm: string;
@@ -41,15 +41,17 @@ export default function Signup({ navigation }: { navigation: any }) {
     }
 
     try {
-      const response = await fetch("http://10.91.21.156:8080/api/signup", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          username: data.username,
-          email: data.email,
-          password: data.password,
-        }),
-      });
+      const response = await fetch(
+        "https://31441177bfdf.ngrok-free.app/api/signup",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email: data.email,
+            password: data.password,
+          }),
+        }
+      );
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -70,127 +72,115 @@ export default function Signup({ navigation }: { navigation: any }) {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>회원가입</Text>
+    console.log("hello"),
+    (
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+        <View style={styles.container}>
+          <Text style={styles.title}>회원가입</Text>
 
-      <Controller
-        control={control}
-        name="username"
-        rules={{
-          required: "아이디를 입력하세요.",
-          minLength: { value: 4, message: "최소 4자리 이상입니다." },
-        }}
-        render={({ field: { onChange, value } }) => (
-          <TextInput
-            placeholder="아이디"
-            placeholderTextColor="#2e9d4c"
-            value={value}
-            onChangeText={onChange}
-            autoCapitalize="none"
-            style={[styles.input, errors.username && styles.errorInput]}
+          <Controller
+            control={control}
+            name="email"
+            rules={{
+              required: "이메일을 입력하세요.",
+              pattern: {
+                value: /\S+@\S+\.\S+/,
+                message: "유효한 이메일 형식이어야 합니다.",
+              },
+            }}
+            render={({ field: { onChange, value } }) => (
+              <TextInput
+                placeholder="이메일"
+                placeholderTextColor="#34A853"
+                value={value}
+                onChangeText={onChange}
+                keyboardType="email-address"
+                autoCapitalize="none"
+                style={[styles.input, errors.email && styles.errorInput]}
+              />
+            )}
           />
-        )}
-      />
-      {errors.username && (
-        <Text style={styles.errorText}>{errors.username.message}</Text>
-      )}
+          {errors.email && (
+            <Text style={styles.errorText}>{errors.email.message}</Text>
+          )}
 
-      <Controller
-        control={control}
-        name="email"
-        rules={{
-          required: "이메일을 입력하세요.",
-          pattern: {
-            value: /\S+@\S+\.\S+/,
-            message: "유효한 이메일 형식이어야 합니다.",
-          },
-        }}
-        render={({ field: { onChange, value } }) => (
-          <TextInput
-            placeholder="이메일"
-            placeholderTextColor="#2e9d4c"
-            value={value}
-            onChangeText={onChange}
-            keyboardType="email-address"
-            autoCapitalize="none"
-            style={[styles.input, errors.email && styles.errorInput]}
+          <Controller
+            control={control}
+            name="password"
+            rules={{
+              required: "비밀번호를 입력하세요.",
+              minLength: { value: 6, message: "최소 6자리 이상이어야 합니다." },
+            }}
+            render={({ field: { onChange, value } }) => (
+              <TextInput
+                placeholder="비밀번호"
+                placeholderTextColor="#34A853"
+                value={value}
+                onChangeText={onChange}
+                secureTextEntry
+                style={[styles.input, errors.password && styles.errorInput]}
+              />
+            )}
           />
-        )}
-      />
-      {errors.email && (
-        <Text style={styles.errorText}>{errors.email.message}</Text>
-      )}
+          {errors.password && (
+            <Text style={styles.errorText}>{errors.password.message}</Text>
+          )}
 
-      <Controller
-        control={control}
-        name="password"
-        rules={{
-          required: "비밀번호를 입력하세요.",
-          minLength: { value: 6, message: "최소 6자리 이상이어야 합니다." },
-        }}
-        render={({ field: { onChange, value } }) => (
-          <TextInput
-            placeholder="비밀번호"
-            placeholderTextColor="#2e9d4c"
-            value={value}
-            onChangeText={onChange}
-            secureTextEntry
-            style={[styles.input, errors.password && styles.errorInput]}
+          <Controller
+            control={control}
+            name="passwordConfirm"
+            rules={{
+              required: "비밀번호 확인을 입력하세요.",
+              minLength: { value: 6, message: "최소 6자리 이상이어야 합니다." },
+            }}
+            render={({ field: { onChange, value } }) => (
+              <TextInput
+                placeholder="비밀번호 확인"
+                placeholderTextColor="#34A853"
+                value={value}
+                onChangeText={onChange}
+                secureTextEntry
+                style={[
+                  styles.input,
+                  errors.passwordConfirm && styles.errorInput,
+                ]}
+              />
+            )}
           />
-        )}
-      />
-      {errors.password && (
-        <Text style={styles.errorText}>{errors.password.message}</Text>
-      )}
+          {errors.passwordConfirm && (
+            <Text style={styles.errorText}>
+              {errors.passwordConfirm.message}
+            </Text>
+          )}
 
-      <Controller
-        control={control}
-        name="passwordConfirm"
-        rules={{
-          required: "비밀번호 확인을 입력하세요.",
-          minLength: { value: 6, message: "최소 6자리 이상이어야 합니다." },
-        }}
-        render={({ field: { onChange, value } }) => (
-          <TextInput
-            placeholder="비밀번호 확인"
-            placeholderTextColor="#2e9d4c"
-            value={value}
-            onChangeText={onChange}
-            secureTextEntry
-            style={[styles.input, errors.passwordConfirm && styles.errorInput]}
-          />
-        )}
-      />
-      {errors.passwordConfirm && (
-        <Text style={styles.errorText}>{errors.passwordConfirm.message}</Text>
-      )}
+          <Pressable
+            onPress={handleSubmit(onSubmit)}
+            disabled={isSubmitting}
+            style={({ pressed }) => [
+              styles.registerButton,
+              isSubmitting && styles.registerButtonDisabled,
+              pressed && !isSubmitting && { opacity: 0.8 },
+            ]}
+            accessibilityRole="button"
+            accessibilityState={{ disabled: isSubmitting }}
+          >
+            {isSubmitting ? (
+              <ActivityIndicator />
+            ) : (
+              <Text style={styles.registerButtonText}>회원가입</Text>
+            )}
+          </Pressable>
 
-      <Pressable
-        onPress={handleSubmit(onSubmit)}
-        disabled={isSubmitting}
-        style={({ pressed }) => [
-          styles.registerButton,
-          isSubmitting && styles.registerButtonDisabled,
-          pressed && !isSubmitting && { opacity: 0.8 },
-        ]}
-        accessibilityRole="button"
-        accessibilityState={{ disabled: isSubmitting }}
-      >
-        {isSubmitting ? (
-          <ActivityIndicator />
-        ) : (
-          <Text style={styles.registerButtonText}>회원가입</Text>
-        )}
-      </Pressable>
+          <View style={styles.row}>
+            <TouchableOpacity onPress={() => navigation.navigate("Login")}>
+              <Text style={styles.linkText}>로그인</Text>
+            </TouchableOpacity>
+          </View>
 
-      <View style={styles.row}>
-        <TouchableOpacity onPress={() => navigation.navigate("Login")}>
-          <Text style={styles.linkText}>로그인</Text>
-        </TouchableOpacity>
-      </View>
-
-      <Text style={styles.note}>* 실제 백엔드 준비되면 API 연동</Text>
-    </View>
+          <Text style={styles.note}>* 실제 백엔드 준비되면 API 연동</Text>
+        </View>
+      </TouchableWithoutFeedback>
+    )
   );
 }
 
@@ -224,7 +214,7 @@ const styles = StyleSheet.create({
     width: "100%",
     maxWidth: 400,
     height: 60,
-    shadowColor: "#86d99c",
+    shadowColor: "#57cf77",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.4,
     shadowRadius: 6,

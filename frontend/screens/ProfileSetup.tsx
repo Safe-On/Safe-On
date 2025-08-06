@@ -1,71 +1,115 @@
-/*
+// ProfileSetup.tsx
 import React, { useState } from "react";
-import { View, Text, Alert, Pressable, StyleSheet } from "react-native";
-import * as Location from "expo-location";
-import * as Notifications from "expo-notifications";
-import * as ImagePicker from "expo-image-picker";
+import {
+  View,
+  Text,
+  Alert,
+  Pressable,
+  StyleSheet,
+  TextInput,
+  Keyboard,
+  TouchableWithoutFeedback,
+} from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import { ActivityIndicator } from "react-native";
-import type { RootStackParamList } from "../navigation/AppNavigator";
+import type { RootStackParamList } from "../App";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Ionicons } from "@expo/vector-icons";
+import OSvg from "../assets/O.svg";
+import OBlackSvg from "../assets/Oblack.svg";
+import XSvg from "../assets/X.svg";
+import XBlackSvg from "../assets/Xblack.svg";
 
 const ProfileSetup: React.FC = () => {
-  const [selectedDisease, setSelectedDisease] = useState("O"|"X");
+  const navigation =
+    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const [selectedDisease, setSelectedDisease] = useState<"O" | "X">("O");
+  const [selectedDisability, setSelectedDisability] = useState<"O" | "X">("O");
 
-  
+  // onPressAgree 함수 정의
+  const onPressAgree = () => {
+    // Alert.alert("시작하기", `선택된 질환: ${selectedDisease}`);
+    // Alert.alert("시작하기", `선택된 장애: ${selectedDisability}`);
+    navigation.navigate("Home");
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <View style={styles.container}>
-        <View style={styles.header}>
-          <Text style={styles.title}>맞춤 쉼터 추천을 위해\n기본 정보를 알려주세요!</Text>
-        </View>
-        <View style={styles.profileSetupList}>
-          <View style={styles.profileSetupItemAge}>
-            <Text style={styles.profileSetupItemAgeText}>나이</Text>
-            <TextInput style={styles.profileSetupItemAgeInput} />
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+      <SafeAreaView style={styles.safeArea}>
+        <View style={styles.container}>
+          <View style={styles.header}>
+            <Text style={styles.title}>
+              맞춤 쉼터 추천을 위해{"\n"}기본 정보를 알려주세요!
+            </Text>
           </View>
-          <View style={styles.profileSetupItemOX}>
-            <Text style={styles.profileSetupItemOXText}>질환</Text>
-            <View style={styles.oxContainer}>
-              {["O", "X"].map((item) => (
-                <Pressable
-                  key={item}
-                  onPress={() => setSelectedDisease(item as "O" | "X")}
-                  style={[
-                    styles.oxButton,
-                    selectedDisease === item ? styles.oxButtonSelected : styles.oxButtonUnselected,
-                  ]}
-                >
-                  <Text
-                    style={[
-                      styles.oxButtonText,
-                      selectedDisease === item ? styles.oxButtonTextSelected : styles.oxButtonTextUnselected,
-                    ]}
-                  >
-                    {item}
-                  </Text>
+
+          <View style={styles.profileSetupList}>
+            {/* 나이 입력 */}
+            <View style={styles.profileSetupItemAge}>
+              <Text style={styles.profileSetupItemAgeText}>나이</Text>
+              <View style={styles.inputWrapper}>
+                <TextInput
+                  style={styles.profileSetupItemAgeInput}
+                  keyboardType="numeric"
+                />
+                <Text style={styles.unitText}>세</Text>
+              </View>
+            </View>
+
+            {/* 질환 선택 */}
+            <View style={styles.profileSetupItemOX}>
+              <Text style={styles.profileSetupItemOXText}>질환</Text>
+              <View style={styles.OXButtonContainer}>
+                <Pressable onPress={() => setSelectedDisease("O")}>
+                  {selectedDisease === "O" ? (
+                    <OSvg width={100} height={100} />
+                  ) : (
+                    <OBlackSvg width={100} height={100} />
+                  )}
                 </Pressable>
-              ))}
+
+                <Pressable onPress={() => setSelectedDisease("X")}>
+                  {selectedDisease === "X" ? (
+                    <XSvg width={100} height={100} />
+                  ) : (
+                    <XBlackSvg width={100} height={100} />
+                  )}
+                </Pressable>
+              </View>
+            </View>
+
+            {/* 장애 선택 */}
+            <View style={styles.profileSetupItemOX}>
+              <Text style={styles.profileSetupItemOXText}>장애</Text>
+              <View style={styles.OXButtonContainer}>
+                <Pressable onPress={() => setSelectedDisability("O")}>
+                  {selectedDisability === "O" ? (
+                    <OSvg width={100} height={100} />
+                  ) : (
+                    <OBlackSvg width={100} height={100} />
+                  )}
+                </Pressable>
+
+                <Pressable onPress={() => setSelectedDisability("X")}>
+                  {selectedDisability === "X" ? (
+                    <XSvg width={100} height={100} />
+                  ) : (
+                    <XBlackSvg width={100} height={100} />
+                  )}
+                </Pressable>
+              </View>
             </View>
           </View>
-          <View style={styles.profileSetupItemOX}>
-            <View style={styles.icon}>
-              <Ionicons name="notifications-outline" size={24} color="black" />
-            </View>
+
+          {/* 시작 버튼 */}
+          <View style={styles.footerbutton}>
+            <Pressable style={styles.button} onPress={onPressAgree}>
+              <Text style={styles.buttonText}>시작하기</Text>
+            </Pressable>
           </View>
         </View>
-        <View style={styles.footerbutton}>
-          <Pressable style={styles.button} onPress={onPressAgree}>
-            <Text style={styles.buttonText}>시작하기기</Text>
-          </Pressable>
-        </View>
-      </View>
-    </SafeAreaView>
+      </SafeAreaView>
+    </TouchableWithoutFeedback>
   );
 };
 
@@ -82,19 +126,67 @@ const styles = StyleSheet.create({
   },
   header: {
     flex: 0.2,
-    alignItems: "center",
   },
   title: {
-    marginTop: 30,
+    marginTop: 40,
     fontSize: 24,
-    fontWeight: "bold",
-    textAlign: "center",
+    fontWeight: "600",
   },
   profileSetupList: {
     flex: 0.6,
     marginTop: 15,
   },
-
+  profileSetupItemAge: {
+    marginBottom: 36,
+  },
+  profileSetupItemAgeText: {
+    fontSize: 16,
+    fontWeight: "600",
+    marginBottom: 16,
+  },
+  inputWrapper: {
+    flexDirection: "row",
+    alignItems: "center",
+    position: "relative",
+  },
+  unitText: {
+    position: "absolute",
+    left: 100,
+    top: 15,
+    fontSize: 16,
+    fontWeight: "600",
+    color: "61b677",
+  },
+  profileSetupItemAgeInput: {
+    borderRadius: 8,
+    padding: 18,
+    width: 130,
+    height: 50,
+    backgroundColor: "#dff5e4",
+  },
+  profileSetupItemOX: {
+    marginBottom: 36,
+    width: "100%",
+  },
+  profileSetupItemOXText: {
+    fontSize: 16,
+    fontWeight: "600",
+    marginBottom: 16,
+  },
+  OXButtonContainer: {
+    flexDirection: "row",
+    width: "100%",
+  },
+  OButton: {
+    width: 50,
+    height: 50,
+    marginHorizontal: 10,
+  },
+  XButton: {
+    width: 50,
+    height: 50,
+    marginHorizontal: 10,
+  },
   footerbutton: {
     flex: 0.2,
     alignItems: "center",
@@ -111,11 +203,9 @@ const styles = StyleSheet.create({
     marginBottom: -55,
     justifyContent: "center",
   },
-
   buttonText: {
     color: "#FFFFFF",
     fontSize: 16,
     fontWeight: "bold",
   },
 });
-*/
