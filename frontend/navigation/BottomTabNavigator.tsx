@@ -36,11 +36,25 @@ export default function BottomTabNavigator() {
 
           return <Ionicons name={iconName} size={size} color={color} />;
         },
+        tabBarActiveTintColor: "green", // 선택된 탭 텍스트 색 (선택사항)
+        tabBarInactiveTintColor: "#8E8E93", // 선택 안된 탭 텍스트 색 (선택사항)
       })}
     >
-      <Tab.Screen name="Map" component={Map} />
-      <Tab.Screen name="Home" component={Home} />
-      <Tab.Screen name="Settings" component={Settings} />
+      <Tab.Screen
+        name="Home"
+        component={Home}
+        options={{ tabBarLabel: "홈" }}
+      />
+      <Tab.Screen
+        name="Map"
+        component={Map}
+        options={{ tabBarLabel: "지도" }}
+      />
+      <Tab.Screen
+        name="Settings"
+        component={Settings}
+        options={{ tabBarLabel: "설정" }}
+      />
     </Tab.Navigator>
   );
 }
