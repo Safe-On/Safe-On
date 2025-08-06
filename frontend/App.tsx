@@ -1,6 +1,6 @@
 // App.tsx
 
-// 잠시 로그인 화면만 실행
+/* 잠시 로그인 화면만 실행
 import React from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
@@ -19,8 +19,9 @@ export default function App() {
     </NavigationContainer>
   );
 }
+*/
 
-/* 원래코드
+// 원래코드
 import React, { useCallback, useEffect, useState } from "react";
 import { View } from "react-native";
 import * as SplashScreen from "expo-splash-screen";
@@ -30,6 +31,7 @@ import FirstScreen from "./screens/FirstScreen";
 import BottomTabNavigator from "./navigation/BottomTabNavigator";
 import Permission from "./screens/Permission";
 import Login from "./screens/Login";
+import Signup from "./screens/Signup";
 SplashScreen.preventAutoHideAsync();
 
 type RootStackParamList = {
@@ -37,6 +39,7 @@ type RootStackParamList = {
   MainTabs: undefined;
   Permission: undefined;
   Login: undefined;
+  Signup: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -74,9 +77,9 @@ export default function App() {
           <Stack.Screen name="MainTabs" component={BottomTabNavigator} />
           <Stack.Screen name="Permission" component={Permission} />
           <Stack.Screen name="Login" component={Login} />
+          <Stack.Screen name="Signup" component={Signup} />
         </Stack.Navigator>
       </NavigationContainer>
     </View>
   );
 }
-*/

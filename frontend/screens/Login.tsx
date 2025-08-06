@@ -2,7 +2,6 @@ import React from "react";
 import {
   View,
   TextInput,
-  Button,
   Text,
   Alert,
   StyleSheet,
@@ -26,19 +25,16 @@ export default function Login({ navigation }: { navigation: any }) {
 
   const onSubmit = async (data: { email: string; password: string }) => {
     try {
-      const response = await fetch(
-        "https://your-backend-domain.com/api/login",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            email: data.email,
-            password: data.password,
-          }),
-        }
-      );
+      const response = await fetch("http://10.91.21.156:8080/api/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: data.email,
+          password: data.password,
+        }),
+      });
 
       if (!response.ok) {
         // 200번대 응답이 아니면 에러로 처리
@@ -78,7 +74,7 @@ export default function Login({ navigation }: { navigation: any }) {
         render={({ field: { onChange, value } }) => (
           <TextInput
             placeholder="이메일(@dgu.ac.kr)"
-            placeholderTextColor={"#FF9728"}
+            placeholderTextColor={"#2e9d4c"}
             value={value}
             onChangeText={onChange}
             keyboardType="email-address"
@@ -101,7 +97,7 @@ export default function Login({ navigation }: { navigation: any }) {
         render={({ field: { onChange, value } }) => (
           <TextInput
             placeholder="비밀번호"
-            placeholderTextColor={"#FF9728"}
+            placeholderTextColor={"#2e9d4c"}
             value={value}
             onChangeText={onChange}
             secureTextEntry
@@ -163,21 +159,21 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 20,
     marginBottom: 17,
-    backgroundColor: "#fff6eb",
+    backgroundColor: "#effaf1",
     width: "100%",
     maxWidth: 400,
     height: 60,
   },
   loginButton: {
-    backgroundColor: "#FF9728",
+    backgroundColor: "#34A853",
     padding: 20,
     borderRadius: 8,
     alignItems: "center",
     width: "100%",
     maxWidth: 400,
     height: 60,
-    // iOS 그림자 - 주황색으로 전체 방향에 그림자 주기
-    shadowColor: "#FFCE93", // 주황색 그림자
+    // iOS 그림자 - 연두색 전체 방향에 그림자 주기
+    shadowColor: "#86d99c", // 연두색 그림자
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.4,
     shadowRadius: 6,
@@ -200,13 +196,13 @@ const styles = StyleSheet.create({
     marginTop: 28,
   },
   linkText: {
-    color: "#FF9728",
+    color: "#2e9d4c",
     fontSize: 14,
     fontWeight: "500",
     marginHorizontal: 6,
   },
   separator: {
-    color: "#FF9728",
+    color: "#2e9d4c",
     marginHorizontal: 6,
     fontWeight: "400",
     fontSize: 14,

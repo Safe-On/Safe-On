@@ -41,18 +41,15 @@ export default function Signup({ navigation }: { navigation: any }) {
     }
 
     try {
-      const response = await fetch(
-        "https://your-backend-domain.com/api/signup",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            username: data.username,
-            email: data.email,
-            password: data.password,
-          }),
-        }
-      );
+      const response = await fetch("http://10.91.21.156:8080/api/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          username: data.username,
+          email: data.email,
+          password: data.password,
+        }),
+      });
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -86,7 +83,7 @@ export default function Signup({ navigation }: { navigation: any }) {
         render={({ field: { onChange, value } }) => (
           <TextInput
             placeholder="아이디"
-            placeholderTextColor="#FF9728"
+            placeholderTextColor="#2e9d4c"
             value={value}
             onChangeText={onChange}
             autoCapitalize="none"
@@ -111,7 +108,7 @@ export default function Signup({ navigation }: { navigation: any }) {
         render={({ field: { onChange, value } }) => (
           <TextInput
             placeholder="이메일"
-            placeholderTextColor="#FF9728"
+            placeholderTextColor="#2e9d4c"
             value={value}
             onChangeText={onChange}
             keyboardType="email-address"
@@ -134,7 +131,7 @@ export default function Signup({ navigation }: { navigation: any }) {
         render={({ field: { onChange, value } }) => (
           <TextInput
             placeholder="비밀번호"
-            placeholderTextColor="#FF9728"
+            placeholderTextColor="#2e9d4c"
             value={value}
             onChangeText={onChange}
             secureTextEntry
@@ -156,7 +153,7 @@ export default function Signup({ navigation }: { navigation: any }) {
         render={({ field: { onChange, value } }) => (
           <TextInput
             placeholder="비밀번호 확인"
-            placeholderTextColor="#FF9728"
+            placeholderTextColor="#2e9d4c"
             value={value}
             onChangeText={onChange}
             secureTextEntry
@@ -214,20 +211,20 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 20,
     marginBottom: 17,
-    backgroundColor: "#fff6eb",
+    backgroundColor: "#effaf1",
     width: "100%",
     maxWidth: 400,
     height: 60,
   },
   registerButton: {
-    backgroundColor: "#FF9728",
+    backgroundColor: "#34A853",
     padding: 20,
     borderRadius: 8,
     alignItems: "center",
     width: "100%",
     maxWidth: 400,
     height: 60,
-    shadowColor: "#FFCE93",
+    shadowColor: "#86d99c",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.4,
     shadowRadius: 6,
@@ -249,7 +246,7 @@ const styles = StyleSheet.create({
     marginTop: 28,
   },
   linkText: {
-    color: "#FF9728",
+    color: "#34A853",
     fontSize: 14,
     fontWeight: "500",
   },
