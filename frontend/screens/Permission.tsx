@@ -126,8 +126,7 @@ const styles = StyleSheet.create({
   title: {
     marginTop: 30,
     fontSize: 24,
-    fontWeight: "bold",
-    textAlign: "center",
+    fontWeight: "600",
   },
   permissionList: {
     flex: 0.6,

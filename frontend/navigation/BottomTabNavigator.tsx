@@ -1,3 +1,4 @@
+// BottomTabNavigator.tsx
 import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import Map from "../screens/Map";
