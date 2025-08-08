@@ -51,18 +51,55 @@ export default function Login({ navigation }: { navigation: any }) {
       const res = await response.json();
 
       // 예: 서버에서 { token: "...", user: {...} } 형태로 반환한다고 가정
-      /*
-      await AsyncStorage.setItem("token", res.token);
-      await AsyncStorage.setItem("user", JSON.stringify(res.user));
-      */
 
-      navigation.navigate("ProfileSetup"); // 로그인 성공 후 메인 화면 이동
+      await AsyncStorage.setItem("LoggedIn", "true");
+
+      // ProfileSetup 완료 여부 확인
+      const profileSetupDone = await AsyncStorage.getItem("ProfileSetupDone");
+
+      if (profileSetupDone === "true") {
+        // 이미 프로필 설정한 사용자 → 홈으로
+        navigation.navigate("BottomTabs", { screen: "Home" });
+      } else {
+        // 아직 프로필 설정 안한 사용자 → 프로필 설정 화면으로
+        navigation.navigate("ProfileSetup");
+      }
     } catch (error: any) {
       Alert.alert(
         "로그인 실패",
         error.message || "아이디나 비밀번호를 확인해 주세요."
       );
     }
+    // 백엔드 없이 테스트용 코드
+    /*
+    try {
+      // ✅ 여기부터는 테스트용 로직
+      console.log("입력된 이메일:", data.email);
+      console.log("입력된 비밀번호:", data.password);
+
+      // 예시: 이메일과 비밀번호가 비어있지 않으면 로그인 성공으로 처리
+      if (!data.email || !data.password) {
+        throw new Error("이메일과 비밀번호를 입력해주세요.");
+      }
+
+      // AsyncStorage에 로그인 상태 저장
+      await AsyncStorage.setItem("LoggedIn", "true");
+
+      // 프로필 설정 여부 확인
+      const profileSetupDone = await AsyncStorage.getItem("ProfileSetupDone");
+
+      if (profileSetupDone === "true") {
+        navigation.navigate("BottomTabs", { screen: "Home" });
+      } else {
+        navigation.navigate("ProfileSetup");
+      }
+    } catch (error: any) {
+      Alert.alert(
+        "로그인 실패",
+        error.message || "아이디나 비밀번호를 확인해 주세요."
+      );
+    }
+    */
   };
 
   return (
