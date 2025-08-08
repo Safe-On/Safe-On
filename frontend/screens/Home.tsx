@@ -22,7 +22,7 @@ type NavigationProp = NativeStackNavigationProp<RootStackParamList, "Home">;
 
 
 export default function Home() {
-  const [rating, setRating] = useState<number>();
+  const [rating, setRating] = useState<number>(0);
   const [congestion, setCongestion] = useState<string>();
   const [climateOption, setClimateOption] = useState<"on" | "off" | null>(null);
   const [accessLevel, setAccessLevel] = useState<string>();

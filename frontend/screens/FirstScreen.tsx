@@ -18,10 +18,15 @@ const FirstScreen: React.FC<Props> = ({ navigation }) => {
     async function initialize() {
       try {
         const permissionAgreed = await AsyncStorage.getItem("PermissionAgreed");
+        const loggedIn = await AsyncStorage.getItem("LoggedIn");
         if (permissionAgreed === "true") {
-          navigation.replace("BottomTabs", undefined);
+          if (loggedIn === "true") {
+            navigation.replace("BottomTabs", { screen: "Home" }); // 권한도 동의했고, 로그인도 되어 있으면 홈으로
+          } else {
+            navigation.replace("Login"); // 권한 동의했지만 로그인 안 했으면 로그인 화면으로
+          }
         } else {
-          navigation.replace("Permission");
+          navigation.replace("Permission"); // 권한 동의 안 했으면 권한 화면으로
         }
       } catch (e) {
         console.warn("초기화 오류:", e);

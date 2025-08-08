@@ -27,10 +27,16 @@ const ProfileSetup: React.FC = () => {
   const [selectedDisability, setSelectedDisability] = useState<"O" | "X">("O");
 
   // onPressAgree 함수 정의
-  const onPressAgree = () => {
-    // Alert.alert("시작하기", `선택된 질환: ${selectedDisease}`);
-    // Alert.alert("시작하기", `선택된 장애: ${selectedDisability}`);
-    navigation.navigate("Home");
+  const onPressAgree = async () => {
+    try {
+      // AsyncStorage에 ProfileSetupDone 저장
+      await AsyncStorage.setItem("ProfileSetupDone", "true");
+
+      // 다음 화면으로 이동
+      navigation.navigate("BottomTabs", { screen: "Home" });
+    } catch (error) {
+      console.error("프로필 완료 상태 저장 실패:", error);
+    }
   };
 
   return (
