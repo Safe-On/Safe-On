@@ -10,9 +10,16 @@ import {
   Animated,
   TextInput,
 } from "react-native";
+import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { Ionicons, FontAwesome, MaterialIcons } from "@expo/vector-icons";
 import { mockNotices } from "../data/mockNotices";
 import { mockWeather } from "../data/mockWeather";
+import AddShelter from "./AddShelter";
+import { RootStackParamList } from "../App";
+
+type NavigationProp = NativeStackNavigationProp<RootStackParamList, "Home">;
+
 
 export default function Home() {
   const [rating, setRating] = useState<number>();
@@ -20,6 +27,7 @@ export default function Home() {
   const [climateOption, setClimateOption] = useState<"on" | "off" | null>(null);
   const [accessLevel, setAccessLevel] = useState<string>();
   const [isScrolled, setIsScrolled] = useState(false);
+  const navigation = useNavigation<NavigationProp>();
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
@@ -213,7 +221,7 @@ export default function Home() {
       {/* 5. 플로팅 “쉼터 추가” 버튼 */}
       <TouchableOpacity
         style={styles.floatingBtn}
-        onPress={() => console.log("쉼터 추가")}
+        onPress={() => navigation.navigate("AddShelter")}
       >
         <Ionicons name="add" size={36} color="#fff" />
         {!isScrolled && <Text style={styles.title}>쉼터추가</Text>}
