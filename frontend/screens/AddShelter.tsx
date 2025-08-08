@@ -7,7 +7,7 @@ import {
   TextInput,
   TouchableOpacity,
   Image,
-  ScrollView
+  ScrollView,
 } from "react-native";
 import { FontAwesome, MaterialIcons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
@@ -19,12 +19,13 @@ export default function AddShelter() {
   const [shelterName, setShelterName] = useState("");
   const [visitTime, setVisitTime] = useState("");
   const [climateOption, setClimateOption] = useState<"on" | "off" | null>(null);
-  const [details, setDetails] = useState("");  
-  const navigation = useNavigation();
+  const [details, setDetails] = useState("");
+  const navigation = useNavigation<any>();
 
   const pickImage = async () => {
     // 권한 요청
-    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    const permissionResult =
+      await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (permissionResult.status !== "granted") {
       alert("사진 접근 권한이 필요합니다!");
       return;
@@ -37,11 +38,11 @@ export default function AddShelter() {
       aspect: [4, 3],
       quality: 1,
     });
-  
+
     if (!result.canceled) {
       setImages((prev) => [...prev, result.assets[0].uri]);
     }
-  }
+  };
 
   const handleSave = () => {
     const shelterData = {
@@ -149,9 +150,8 @@ export default function AddShelter() {
 
       {/* 8. 하단바 */}
     </SafeAreaView>
-  );  
+  );
 }
-
 
 const styles = StyleSheet.create({
   container: {

@@ -78,8 +78,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderBottomWidth: 1,
     borderBottomColor: "#eaeaea",
+    height: 42,
   },
   title: {
+    marginTop: -2,
     fontSize: 18,
     fontWeight: "700",
   },

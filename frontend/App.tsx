@@ -1,7 +1,6 @@
 // App.tsx
-
 import React, { useCallback, useEffect, useState } from "react";
-import { View } from "react-native";
+import { GestureHandlerRootView } from "react-native-gesture-handler"; // 추가
 import * as SplashScreen from "expo-splash-screen";
 import AppNavigator from "./navigation/AppNavigator";
 
@@ -32,12 +31,12 @@ export default function App() {
   if (!isReady) return null;
 
   return (
-    <View style={{ flex: 1 }} onLayout={onLayoutRootView}>
+    <GestureHandlerRootView style={{ flex: 1 }} onLayout={onLayoutRootView}>
       <AppNavigator />
-    </View>
+    </GestureHandlerRootView>
   );
 }
-*/
+/*
 // 특정 스크린만 테스트 하고 싶은 경우, 아래 코드 수정해서 사용
 
 import React from "react";
@@ -73,4 +72,4 @@ export default function App() {
     </NavigationContainer>
   );
 }
-
+*/
