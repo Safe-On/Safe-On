@@ -3,7 +3,6 @@ import React, { useState } from "react";
 import {
   View,
   Text,
-  Alert,
   Pressable,
   StyleSheet,
   TextInput,
@@ -25,13 +24,21 @@ const ProfileSetup: React.FC = () => {
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const [selectedDisease, setSelectedDisease] = useState<"O" | "X">("O");
   const [selectedDisability, setSelectedDisability] = useState<"O" | "X">("O");
+  const [age, setAge] = useState("");
 
   // onPressAgree 함수 정의
   const onPressAgree = async () => {
     try {
       // AsyncStorage에 ProfileSetupDone 저장
       await AsyncStorage.setItem("ProfileSetupDone", "true");
-
+      await AsyncStorage.setItem("age", age);
+      await AsyncStorage.setItem("disease", selectedDisease);
+      await AsyncStorage.setItem("disability", selectedDisability);
+      console.log("프로필 저장 완료:", {
+        age,
+        selectedDisease,
+        selectedDisability,
+      });
       // 다음 화면으로 이동
       navigation.navigate("BottomTabs", { screen: "Home" });
     } catch (error) {
@@ -57,6 +64,8 @@ const ProfileSetup: React.FC = () => {
                 <TextInput
                   style={styles.profileSetupItemAgeInput}
                   keyboardType="numeric"
+                  onChangeText={setAge}
+                  value={age}
                 />
                 <Text style={styles.unitText}>세</Text>
               </View>
@@ -161,7 +170,7 @@ const styles = StyleSheet.create({
     top: 15,
     fontSize: 16,
     fontWeight: "600",
-    color: "61b677",
+    color: "#61b677",
   },
   profileSetupItemAgeInput: {
     borderRadius: 8,

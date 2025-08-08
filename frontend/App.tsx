@@ -1,6 +1,5 @@
-// App.tsx
 import React, { useCallback, useEffect, useState } from "react";
-import { View } from "react-native";
+import { GestureHandlerRootView } from "react-native-gesture-handler"; // 추가
 import * as SplashScreen from "expo-splash-screen";
 import AppNavigator from "./navigation/AppNavigator";
 
@@ -31,9 +30,9 @@ export default function App() {
   if (!isReady) return null;
 
   return (
-    <View style={{ flex: 1 }} onLayout={onLayoutRootView}>
+    <GestureHandlerRootView style={{ flex: 1 }} onLayout={onLayoutRootView}>
       <AppNavigator />
-    </View>
+    </GestureHandlerRootView>
   );
 }
 
