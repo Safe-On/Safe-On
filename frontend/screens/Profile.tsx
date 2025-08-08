@@ -5,8 +5,13 @@ import { useNavigation } from "@react-navigation/native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { TextInput } from "react-native-gesture-handler";
+import { Ionicons } from "@expo/vector-icons";
+import type { RootStackParamList } from "../navigation/AppNavigator";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 export default function Profile() {
+  const navigation =
+    useNavigation<NativeStackNavigationProp<RootStackParamList, "Profile">>();
   const [name, setName] = React.useState("");
   const [phone, setPhone] = React.useState("");
   const [age, setAge] = React.useState("");
@@ -16,12 +21,14 @@ export default function Profile() {
   useEffect(() => {
     const loadData = async () => {
       try {
+        const savedName = await AsyncStorage.getItem("name");
+        const savedPhone = await AsyncStorage.getItem("phone");
         const savedAge = await AsyncStorage.getItem("age");
         const savedDisease = await AsyncStorage.getItem("disease");
         const savedDisability = await AsyncStorage.getItem("disability");
-        console.log("loadData - age:", savedAge);
-        console.log("loadData - disease:", savedDisease);
-        console.log("loadData - disability:", savedDisability);
+
+        setName(savedName || "");
+        setPhone(savedPhone || "");
         setAge(savedAge || "");
         setDisease(savedDisease || "X");
         setDisability(savedDisability || "X");
@@ -40,16 +47,19 @@ export default function Profile() {
   return (
     <SafeAreaView style={styles.SafeAreaView} edges={["top", "left", "right"]}>
       <View style={styles.header}>
+        <Pressable onPress={() => navigation.goBack()} style={styles.backBtn}>
+          <Ionicons name="chevron-back-outline" size={28} color="black" />
+        </Pressable>
         <Text style={styles.title}>내 정보</Text>
       </View>
       <View style={styles.container}>
         {/* 스크롤 가능한 설정 목록 */}
-        <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.main}>
+        <ScrollView style={{ flex: 0.73 }} contentContainerStyle={styles.main}>
           <View style={styles.label}>
             <Text style={styles.labelText}>이름</Text>
             <TextInput
-              style={styles.input}
-              placeholder="이름을 입력해주세요"
+              style={styles.inputName}
+              placeholder="이름 입력"
               value={name}
               onChangeText={setName}
             />
@@ -58,8 +68,8 @@ export default function Profile() {
           <View style={styles.label}>
             <Text style={styles.labelText}>전화번호</Text>
             <TextInput
-              style={styles.input}
-              placeholder="전화번호를 입력해주세요"
+              style={styles.inputPhone}
+              placeholder="전화번호 입력"
               value={phone}
               onChangeText={setPhone}
               keyboardType="phone-pad"
@@ -125,6 +135,11 @@ const styles = StyleSheet.create({
     borderBottomColor: "#eaeaea",
     height: 42,
   },
+  backBtn: {
+    position: "absolute",
+    left: 16,
+    top: 3,
+  },
   title: {
     marginTop: -4,
     fontSize: 18,
@@ -146,18 +161,28 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "400",
   },
-  input: {
-    flex: 1,
+  inputName: {
     height: 40,
-    borderColor: "#eaeaea",
-    borderWidth: 1,
+    backgroundColor: "#effaf1",
     borderRadius: 8,
     paddingHorizontal: 12,
     fontSize: 16,
     fontWeight: "400",
+    width: 100,
+    textAlign: "center",
+  },
+  inputPhone: {
+    height: 40,
+    backgroundColor: "#effaf1",
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    fontSize: 16,
+    fontWeight: "400",
+    width: 160,
+    textAlign: "center",
   },
   footerbutton: {
-    flex: 0.2,
+    flex: 0.27,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -169,7 +194,6 @@ const styles = StyleSheet.create({
     width: "100%",
     maxWidth: 400,
     height: 60,
-    marginBottom: -55,
     justifyContent: "center",
   },
 
