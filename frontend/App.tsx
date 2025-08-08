@@ -1,4 +1,5 @@
 // App.tsx
+
 import React, { useCallback, useEffect, useState } from "react";
 import { View } from "react-native";
 import * as SplashScreen from "expo-splash-screen";
@@ -36,18 +37,22 @@ export default function App() {
     </View>
   );
 }
-
+*/
 // 특정 스크린만 테스트 하고 싶은 경우, 아래 코드 수정해서 사용
-/*
+
 import React from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import ProfileSetup from "./screens/ProfileSetup";
+import Home from "./screens/Home";
+import AddShelter from "./screens/AddShelter";
 import BottomTabNavigator from "./navigation/BottomTabNavigator";
 import Profile from "./screens/Profile";
 
 export type RootStackParamList = {
   BottomTabs: undefined;
   Profile: undefined;
+  AddShelter: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -59,10 +64,13 @@ export default function App() {
         initialRouteName="BottomTabs"
         screenOptions={{ headerShown: false }}
       >
+        <Stack.Screen name="ProfileSetup" component={ProfileSetup} />
+        <Stack.Screen name="Home" component={Home} />
+        <Stack.Screen name="AddShelter" component={AddShelter} />
         <Stack.Screen name="BottomTabs" component={BottomTabNavigator} />
         <Stack.Screen name="Profile" component={Profile} />
       </Stack.Navigator>
     </NavigationContainer>
   );
 }
-*/
+
