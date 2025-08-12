@@ -27,6 +27,8 @@ export default function Login({ navigation }: { navigation: any }) {
   });
 
   const onSubmit = async (data: { email: string; password: string }) => {
+    // 백엔드 연동한 실제 사용 코드
+    /*
     try {
       const response = await fetch(
         "https://fe66c90452d7.ngrok-free.app/api/login",
@@ -70,9 +72,12 @@ export default function Login({ navigation }: { navigation: any }) {
         error.message || "아이디나 비밀번호를 확인해 주세요."
       );
     }
+      */
     // 백엔드 없이 테스트용 코드
-    /*
+
     try {
+      const profileSetupDone = await AsyncStorage.getItem("ProfileSetupDone");
+      console.log("AsyncStorage - ProfileSetupDone:", profileSetupDone);
       // ✅ 여기부터는 테스트용 로직
       console.log("입력된 이메일:", data.email);
       console.log("입력된 비밀번호:", data.password);
@@ -86,8 +91,6 @@ export default function Login({ navigation }: { navigation: any }) {
       await AsyncStorage.setItem("LoggedIn", "true");
 
       // 프로필 설정 여부 확인
-      const profileSetupDone = await AsyncStorage.getItem("ProfileSetupDone");
-
       if (profileSetupDone === "true") {
         navigation.navigate("BottomTabs", { screen: "Home" });
       } else {
@@ -99,7 +102,6 @@ export default function Login({ navigation }: { navigation: any }) {
         error.message || "아이디나 비밀번호를 확인해 주세요."
       );
     }
-    */
   };
 
   return (
@@ -183,7 +185,20 @@ export default function Login({ navigation }: { navigation: any }) {
           </TouchableOpacity>
         </View>
 
-        <Text style={styles.note}>* 실제 백엔드 준비되면 API 연동</Text>
+        <Pressable
+          onPress={async () => {
+            await AsyncStorage.removeItem("ProfileSetupDone");
+            await AsyncStorage.removeItem("age");
+            await AsyncStorage.removeItem("disease");
+            await AsyncStorage.removeItem("disability");
+            Alert.alert("초기화 완료", "프로필 정보가 초기화되었습니다.");
+          }}
+          style={{ marginTop: 20, padding: 10, backgroundColor: "#f00" }}
+        >
+          <Text style={{ color: "#fff", textAlign: "center" }}>
+            프로필 초기화
+          </Text>
+        </Pressable>
       </View>
     </TouchableWithoutFeedback>
   );
