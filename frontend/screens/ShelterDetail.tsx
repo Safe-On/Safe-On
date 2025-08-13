@@ -1,10 +1,26 @@
 import React,{useState} from "react";
-import { View, SafeAreaView, TouchableOpacity, StyleSheet, Text, ScrollView, Image, FlatList, Dimensions, Linking, Platform } from "react-native";
+import {
+  View,
+  SafeAreaView,
+  TouchableOpacity,
+  StyleSheet,
+  Text,
+  ScrollView,
+  Image,
+  FlatList,
+  Dimensions,
+  Linking,
+  Platform,
+  Alert,
+} from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
-import { useNavigation, useRoute } from "@react-navigation/native";
 import Home from "./Home";
 import {SHELTERS} from "../data/mockDetail";
 import * as Speech from "expo-speech";
+import type { NativeStackScreenProps } from "@react-navigation/native-stack";
+import type { RootStackParamList } from "../App";
+
+type Props = NativeStackScreenProps<RootStackParamList, "ShelterDetail">;
 
 const SCREEN_W = Dimensions.get("window").width;
 const H_PADDING = 20;
@@ -90,9 +106,8 @@ function weeklyHours(schedule: any) {
   }));
 }
 
-export default function ShelterDetail() {
-  const navigation = useNavigation();
-  const route = useRoute<any>();
+
+export default function ShelterDetail({ navigation, route }: Props) {
   const shelterId = route.params?.shelterId ?? "TEST_001";
   const shelter = SHELTERS[shelterId];
 
@@ -100,19 +115,19 @@ export default function ShelterDetail() {
 
   const [isFav, setIsFav] = useState<boolean>(false);
 
-const showToast = (msg: string) => {
-  if (Platform.OS === "android") {
-    const { ToastAndroid } = require("react-native"); // ← Android일 때만 로드
-    ToastAndroid.show(msg, ToastAndroid.SHORT);
-  } else if (Platform.OS === "ios") {
-    Alert.alert("", msg);
-  } else {
-    // web 등
-    // @ts-ignore
-    if (typeof window !== "undefined" && window.alert) window.alert(msg);
-    else console.log(msg);
-  }
-};
+  const showToast = (msg: string) => {
+    if (Platform.OS === "android") {
+      const { ToastAndroid } = require("react-native"); // ← Android일 때만 로드
+      ToastAndroid.show(msg, ToastAndroid.SHORT);
+    } else if (Platform.OS === "ios") {
+      Alert.alert("", msg);
+    } else {
+      // web 등
+      // @ts-ignore
+      if (typeof window !== "undefined" && window.alert) window.alert(msg);
+      else console.log(msg);
+    }
+  };
 
   const onToggleFavorite = () => {
     setIsFav((prev) => {
@@ -153,7 +168,6 @@ const showToast = (msg: string) => {
       Speech.speak(text, { language: "ko-KR", rate: 0.8, pitch: 0.8 });
     }
   };
-
 
   return (
     <SafeAreaView style={styles.container}>
@@ -226,7 +240,7 @@ const showToast = (msg: string) => {
             }}
           />
           <View style={styles.pagination}>
-            {(shelter?.photos ?? []).map((_, i) => (
+            {(shelter?.photos ?? []).map((_: string, i: number) => (
               <View
                 key={i}
                 style={[styles.dot, i === current && styles.dotActive]}

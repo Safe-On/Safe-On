@@ -47,6 +47,7 @@ export default function Home() {
             <Ionicons name="notifications-outline" size={30} color="#34A853" />
           </TouchableOpacity>
           <Image
+            // cspell:disable-next-line
             source={require("../assets/safeon_logo.jpg")}
             style={styles.image}
           />
@@ -63,10 +64,14 @@ export default function Home() {
         {/* 3. 즐겨찾기, 쉼터 공지 */}
         <View style={styles.favorites}>
           {/* 즐겨찾기 */}
-          <View style={styles.cardFav}>
+          <TouchableOpacity
+            style={styles.cardFav}
+            onPress={() => navigation.navigate("Star")}
+            activeOpacity={0.7}
+          >
             <Text style={styles.title}>쉼터 즐겨찾기</Text>
             <FontAwesome name="star" size={70} color="#FFD700" />
-          </View>
+          </TouchableOpacity>
           {/* 쉼터 공지 */}
           <View style={styles.cardNotice}>
             <Text style={styles.subTitle}>쉼터 공지</Text>
