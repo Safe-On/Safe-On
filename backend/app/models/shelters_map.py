@@ -5,6 +5,5 @@ KIND_TO_TABLE = {
     "climate": "shelters_climate",
     "heat": "shelters_heat",
     "finedust": "shelters_finedust",
-    "shade": "shelters_shade",
     "smart": "shelters_smart",
 }
