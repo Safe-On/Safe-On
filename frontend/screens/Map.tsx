@@ -194,6 +194,7 @@ export default function Map() {
         <View style={styles.modalOverlay}>
           <View style={styles.modalBox}>
             <Text style={styles.modalTitle}>카테고리 선택</Text>
+            {/* 각 카테고리마다 버튼 만듦 */}
             {CATEGORY_OPTIONS.map((cat) => (
               <TouchableOpacity
                 key={cat}
