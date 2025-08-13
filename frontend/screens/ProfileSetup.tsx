@@ -8,38 +8,78 @@ import {
   TextInput,
   Keyboard,
   TouchableWithoutFeedback,
+  ScrollView,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import type { RootStackParamList } from "../navigation/AppNavigator";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { SafeAreaView } from "react-native-safe-area-context";
-import OSvg from "../assets/O.svg";
-import OBlackSvg from "../assets/Oblack.svg";
-import XSvg from "../assets/X.svg";
-import XBlackSvg from "../assets/Xblack.svg";
+
+const timeOptions = [
+  {
+    id: "1",
+    title: "10분 미만",
+    subtitle1: "이동 보조기구 사용 / 장거리 보행 불가",
+    subtitle2: "자주 휴식이 필요하거나 이동 보조기구를 사용한다.",
+  },
+  {
+    id: "2",
+    title: "10분~20분 (500m~1.5km)",
+    subtitle1: "짧은 거리만 가능",
+    subtitle2: "평지는 무리 없으나, 언덕이나 계단은 힘들다.",
+  },
+  {
+    id: "3",
+    title: "20분~30분 (1.5km~2.5km)",
+    subtitle1: "평소 걷기에 무리가 없음",
+    subtitle2: "평지를 무리 없이 걸을 수 있으며, 경사로도 천천히 오를 수 있다.",
+  },
+  {
+    id: "4",
+    title: "30분 이상 (2.5km)",
+    subtitle1: "평지, 언덕 포함 장거리 이동 가능",
+    subtitle2: "장시간 보행 가능, 등산, 장거리 산책이 가능하다.",
+  },
+];
+
+const diseaseOptions = [
+  {
+    id: "1",
+    title: "보행 보조기구 사용 (예: 휠체어, 지팡이, 보행차)",
+  },
+  {
+    id: "2",
+    title: "호흡기, 심혈관 질환",
+  },
+  {
+    id: "3",
+    title: "임신 중중",
+  },
+  {
+    id: "4",
+    title: "없음",
+  },
+];
 
 const ProfileSetup: React.FC = () => {
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
-  const [selectedDisease, setSelectedDisease] = useState<"O" | "X">("O");
-  const [selectedDisability, setSelectedDisability] = useState<"O" | "X">("O");
+  const [selectedDisease, setSelectedDisease] = useState<null | string>(null);
   const [age, setAge] = useState("");
+  const [selectedTime, setSelectedTime] = useState<null | string>(null);
 
-  // onPressAgree 함수 정의
   const onPressAgree = async () => {
     try {
-      // AsyncStorage에 ProfileSetupDone 저장
       await AsyncStorage.setItem("ProfileSetupDone", "true");
       await AsyncStorage.setItem("age", age);
-      await AsyncStorage.setItem("disease", selectedDisease);
-      await AsyncStorage.setItem("disability", selectedDisability);
+      await AsyncStorage.setItem("Time", selectedTime ?? "");
+      await AsyncStorage.setItem("disability", selectedDisease ?? "");
       console.log("프로필 저장 완료:", {
         age,
+        selectedTime,
         selectedDisease,
-        selectedDisability,
       });
-      // 다음 화면으로 이동
       navigation.navigate("BottomTabs", { screen: "Home" });
     } catch (error) {
       console.error("프로필 완료 상태 저장 실패:", error);
@@ -49,79 +89,70 @@ const ProfileSetup: React.FC = () => {
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
       <SafeAreaView style={styles.safeArea}>
-        <View style={styles.container}>
-          <View style={styles.header}>
-            <Text style={styles.title}>
-              맞춤 쉼터 추천을 위해{"\n"}기본 정보를 알려주세요!
+        <ScrollView contentContainerStyle={styles.scrollContainer}>
+          <Text style={styles.title}>
+            맞춤 쉼터 추천을 위해{"\n"}기본 정보를 알려주세요!
+          </Text>
+
+          {/* 나이 입력 */}
+          <View style={styles.inputWrapper}>
+            <Text style={styles.label}>나이</Text>
+            <TextInput
+              style={styles.ageInput}
+              keyboardType="numeric"
+              onChangeText={setAge}
+              value={age}
+              placeholder="나이 입력"
+            />
+            <Text style={styles.unitText}>세</Text>
+          </View>
+
+          {/* 걸을 수 있는 시간 선택 */}
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>
+              한 번에 걸을 수 있는 시간을 알려주세요.{"\n"}*현재 건강 상태 기준
             </Text>
+            {timeOptions.map((option) => (
+              <Pressable
+                key={option.id}
+                onPress={() => setSelectedTime(option.id)}
+                style={[
+                  styles.optionButton,
+                  selectedTime === option.id && styles.optionButtonSelected,
+                ]}
+              >
+                <Text style={styles.optionTitle}>{option.title}</Text>
+                <Text style={styles.optionSubtitle}>{option.subtitle1}</Text>
+                <Text style={styles.optionSubtitle}>{option.subtitle2}</Text>
+              </Pressable>
+            ))}
           </View>
 
-          <View style={styles.profileSetupList}>
-            {/* 나이 입력 */}
-            <View style={styles.profileSetupItemAge}>
-              <Text style={styles.profileSetupItemAgeText}>나이</Text>
-              <View style={styles.inputWrapper}>
-                <TextInput
-                  style={styles.profileSetupItemAgeInput}
-                  keyboardType="numeric"
-                  onChangeText={setAge}
-                  value={age}
-                />
-                <Text style={styles.unitText}>세</Text>
-              </View>
-            </View>
-
-            {/* 질환 선택 */}
-            <View style={styles.profileSetupItemOX}>
-              <Text style={styles.profileSetupItemOXText}>질환</Text>
-              <View style={styles.OXButtonContainer}>
-                <Pressable onPress={() => setSelectedDisease("O")}>
-                  {selectedDisease === "O" ? (
-                    <OSvg width={100} height={100} />
-                  ) : (
-                    <OBlackSvg width={100} height={100} />
-                  )}
-                </Pressable>
-
-                <Pressable onPress={() => setSelectedDisease("X")}>
-                  {selectedDisease === "X" ? (
-                    <XSvg width={100} height={100} />
-                  ) : (
-                    <XBlackSvg width={100} height={100} />
-                  )}
-                </Pressable>
-              </View>
-            </View>
-
-            {/* 장애 선택 */}
-            <View style={styles.profileSetupItemOX}>
-              <Text style={styles.profileSetupItemOXText}>장애</Text>
-              <View style={styles.OXButtonContainer}>
-                <Pressable onPress={() => setSelectedDisability("O")}>
-                  {selectedDisability === "O" ? (
-                    <OSvg width={100} height={100} />
-                  ) : (
-                    <OBlackSvg width={100} height={100} />
-                  )}
-                </Pressable>
-
-                <Pressable onPress={() => setSelectedDisability("X")}>
-                  {selectedDisability === "X" ? (
-                    <XSvg width={100} height={100} />
-                  ) : (
-                    <XBlackSvg width={100} height={100} />
-                  )}
-                </Pressable>
-              </View>
-            </View>
+          {/* 장애 선택 */}
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>
+              이동에 영향을 주는 건강 상태가 있나요?{"\n"}*중복 선택 가능
+            </Text>
+            {diseaseOptions.map((option) => (
+              <Pressable
+                key={option.id}
+                onPress={() => setSelectedDisease(option.id)}
+                style={[
+                  styles.optionButton,
+                  selectedDisease === option.id && styles.optionButtonSelected,
+                ]}
+              >
+                <Text style={styles.optionTitle}>{option.title}</Text>
+              </Pressable>
+            ))}
           </View>
+        </ScrollView>
 
-          {/* 시작 버튼 */}
-          <View style={styles.footerbutton}>
-            <Pressable style={styles.button} onPress={onPressAgree}>
-              <Text style={styles.buttonText}>시작하기</Text>
-            </Pressable>
-          </View>
+        {/* 시작 버튼 */}
+        <View style={styles.footer}>
+          <Pressable style={styles.startButton} onPress={onPressAgree}>
+            <Text style={styles.startButtonText}>시작하기</Text>
+          </Pressable>
         </View>
       </SafeAreaView>
     </TouchableWithoutFeedback>
@@ -131,96 +162,58 @@ const ProfileSetup: React.FC = () => {
 export default ProfileSetup;
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: "#fff",
-  },
-  container: {
-    flex: 1,
+  safeArea: { flex: 1, backgroundColor: "#fff" },
+  scrollContainer: {
     paddingHorizontal: 16,
+    paddingBottom: 40,
   },
-  header: {
-    flex: 0.2,
-  },
-  title: {
-    marginTop: 40,
-    fontSize: 24,
-    fontWeight: "600",
-  },
-  profileSetupList: {
-    flex: 0.6,
-    marginTop: 15,
-  },
-  profileSetupItemAge: {
-    marginBottom: 36,
-  },
-  profileSetupItemAgeText: {
-    fontSize: 16,
-    fontWeight: "600",
-    marginBottom: 16,
-  },
-  inputWrapper: {
-    flexDirection: "row",
-    alignItems: "center",
-    position: "relative",
-  },
-  unitText: {
-    position: "absolute",
-    left: 100,
-    top: 15,
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#61b677",
-  },
-  profileSetupItemAgeInput: {
+  title: { fontSize: 24, fontWeight: "600", marginVertical: 40 },
+  inputWrapper: { marginBottom: 30, position: "relative" },
+  label: { fontSize: 16, fontWeight: "600", marginBottom: 10 },
+  ageInput: {
     borderRadius: 8,
-    padding: 18,
+    padding: 15,
     width: 130,
     height: 50,
     backgroundColor: "#dff5e4",
+    fontSize: 16,
   },
-  profileSetupItemOX: {
-    marginBottom: 36,
-    width: "100%",
-  },
-  profileSetupItemOXText: {
+  unitText: {
+    position: "absolute",
+    left: 140,
+    top: 42,
     fontSize: 16,
     fontWeight: "600",
-    marginBottom: 16,
   },
-  OXButtonContainer: {
-    flexDirection: "row",
+  section: { marginBottom: 30 },
+  sectionTitle: { fontSize: 16, fontWeight: "600", marginBottom: 12 },
+  optionButton: {
     width: "100%",
-  },
-  OButton: {
-    width: 50,
-    height: 50,
-    marginHorizontal: 10,
-  },
-  XButton: {
-    width: 50,
-    height: 50,
-    marginHorizontal: 10,
-  },
-  footerbutton: {
-    flex: 0.2,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  button: {
-    backgroundColor: "#34A853",
+    borderWidth: 1,
+    borderColor: "#ddd",
+    borderRadius: 10,
     padding: 12,
+    marginBottom: 8,
+    backgroundColor: "#fff",
+  },
+  optionButtonSelected: { backgroundColor: "#d1f4d9", borderWidth: 0 },
+  optionTitle: { fontSize: 16, fontWeight: "600", marginBottom: 2 },
+  optionSubtitle: { fontSize: 12, color: "#666" },
+  startButton: {
+    backgroundColor: "#34A853",
+    padding: 15,
     borderRadius: 8,
     alignItems: "center",
-    width: "100%",
-    maxWidth: 400,
-    height: 60,
-    marginBottom: -55,
     justifyContent: "center",
+    width: "100%",
+    height: 60,
   },
-  buttonText: {
-    color: "#FFFFFF",
-    fontSize: 16,
-    fontWeight: "bold",
+  startButtonText: { color: "#fff", fontSize: 16, fontWeight: "bold" },
+  footer: {
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: 16,
+    paddingBottom: 16,
+    paddingTop: 10,
   },
 });
