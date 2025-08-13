@@ -8,12 +8,11 @@ import {
   Text,
   FlatList,
   Linking,
-  Platform
+  Platform,
 } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { FAVORITES_MOCK, type FavoritePlace } from "../data/mockFavorite";
-import type { RootStackParamList } from "../App";
 
 export default function Star() {
   const navigation = useNavigation<any>();
@@ -105,7 +104,7 @@ export default function Star() {
       <View style={styles.header}>
         {/* 뒤로가기 */}
         <TouchableOpacity
-          onPress={() => navigation.navigate("Home")}
+          onPress={() => navigation.goBack()}
           style={styles.backBtn}
         >
           <MaterialIcons name="arrow-back-ios" size={24} color="black" />
