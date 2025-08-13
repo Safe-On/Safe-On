@@ -1,4 +1,4 @@
-import React,{useState} from "react";
+import React, { useState } from "react";
 import {
   View,
   SafeAreaView,
@@ -14,13 +14,10 @@ import {
   Alert,
 } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
-import Home from "./Home";
-import {SHELTERS} from "../data/mockDetail";
+import { useNavigation, useRoute, RouteProp } from "@react-navigation/native";
 import * as Speech from "expo-speech";
-import type { NativeStackScreenProps } from "@react-navigation/native-stack";
-import type { RootStackParamList } from "../App";
-
-type Props = NativeStackScreenProps<RootStackParamList, "ShelterDetail">;
+import { RootStackParamList } from "../navigation/AppNavigator";
+import { SHELTERS } from "../data/mockDetail";
 
 const SCREEN_W = Dimensions.get("window").width;
 const H_PADDING = 20;
@@ -28,7 +25,7 @@ const ITEM_GAP = 12;
 const ITEM_W = SCREEN_W - H_PADDING * 2;
 
 const DAY_ORDER = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"] as const;
-const DAY_LABEL: Record<string, string> = {
+const DAY_LABEL: Record<(typeof DAY_ORDER)[number] | "hol", string> = {
   mon: "월",
   tue: "화",
   wed: "수",
@@ -56,13 +53,30 @@ const openMap = (addr?: string) => {
   Linking.openURL(url);
 };
 
-
 function toMin(hhmm: string) {
   const [h, m] = hhmm.split(":").map(Number);
   return h * 60 + m;
 }
 
-function isOpenNow(schedule: any, date = new Date()): boolean {
+type BreakTime = {
+  start: string;
+  end: string;
+};
+
+type DailySchedule = {
+  closed?: boolean;
+  open?: {
+    start: string;
+    end: string;
+  };
+  breaks?: BreakTime[];
+};
+
+type Schedule = Partial<
+  Record<(typeof DAY_ORDER)[number] | "hol", DailySchedule>
+>;
+
+function isOpenNow(schedule: Schedule, date = new Date()): boolean {
   const dayIdx = date.getDay(); // 0=Sun
   const key = dayIdx === 0 ? "sun" : DAY_ORDER[dayIdx - 1];
   const d = schedule?.[key];
@@ -84,46 +98,45 @@ function isOpenNow(schedule: any, date = new Date()): boolean {
   return open;
 }
 
-function formatDailyHours(d: any) {
+function formatDailyHours(d: DailySchedule | undefined) {
   if (!d || d.closed || !d.open) return "휴무";
   const base = `${d.open.start}–${d.open.end}`;
   const brk = d.breaks?.length
-    ? ` (점심 ${d.breaks.map((b: any) => `${b.start}–${b.end}`).join(", ")})`
+    ? ` (점심 ${d.breaks.map((b) => `${b.start}–${b.end}`).join(", ")})`
     : "";
   return base + brk;
 }
 
-function formatTodayHours(schedule: any, date = new Date()) {
+function formatTodayHours(schedule: Schedule, date = new Date()) {
   const dayIdx = date.getDay(); // 0=Sun
   const key = dayIdx === 0 ? "sun" : DAY_ORDER[dayIdx - 1];
   return formatDailyHours(schedule?.[key]);
 }
 
-function weeklyHours(schedule: any) {
+function weeklyHours(schedule: Schedule) {
   return DAY_ORDER.map((k) => ({
     day: `${DAY_LABEL[k]}요일`,
     text: formatDailyHours(schedule?.[k]),
   }));
 }
 
+type Shelter = (typeof SHELTERS)[keyof typeof SHELTERS];
 
-export default function ShelterDetail({ navigation, route }: Props) {
+export default function ShelterDetail() {
+  const navigation = useNavigation();
+  const route = useRoute<RouteProp<RootStackParamList, "ShelterDetail">>();
   const shelterId = route.params?.shelterId ?? "TEST_001";
-  const shelter = SHELTERS[shelterId];
-
+  const shelter = (SHELTERS as Record<string, Shelter | undefined>)[shelterId];
   const [current, setCurrent] = useState(0);
-
   const [isFav, setIsFav] = useState<boolean>(false);
 
   const showToast = (msg: string) => {
     if (Platform.OS === "android") {
-      const { ToastAndroid } = require("react-native"); // ← Android일 때만 로드
+      const { ToastAndroid } = require("react-native");
       ToastAndroid.show(msg, ToastAndroid.SHORT);
     } else if (Platform.OS === "ios") {
       Alert.alert("", msg);
     } else {
-      // web 등
-      // @ts-ignore
       if (typeof window !== "undefined" && window.alert) window.alert(msg);
       else console.log(msg);
     }
@@ -132,7 +145,6 @@ export default function ShelterDetail({ navigation, route }: Props) {
   const onToggleFavorite = () => {
     setIsFav((prev) => {
       const next = !prev;
-      // 추가될 때만 메시지 띄우고 싶으면 if (next) 만 남겨도 됨
       showToast(
         next ? "즐겨찾기에 추가되었습니다." : "즐겨찾기가 해제되었습니다."
       );
@@ -141,31 +153,36 @@ export default function ShelterDetail({ navigation, route }: Props) {
   };
 
   const onPressTTS = async () => {
-    const speaking = await Speech.isSpeakingAsync();
-    if (speaking) {
-      Speech.stop(); // 다시 누르면 정지
-      return;
-    }
-    const text =
-      [
-        shelter?.name,
-        shelter?.category,
-        shelter?.address && `주소 ${shelter.address}`,
-        shelter?.phone && `전화 ${shelter.phone}`,
-        shelter?.schedule &&
-          `오늘 운영시간 ${formatTodayHours(shelter.schedule)}`,
-        shelter?.eligibility?.groups?.length &&
-          `이용 대상 ${shelter.eligibility.groups.join(", ")}`,
-        shelter?.usage?.howTo && `이용 방법 ${shelter.usage.howTo}`,
-        shelter?.usage?.procedure?.length &&
-          `이용 절차 ${shelter.usage.procedure.join(", 다음, ")}`,
-        shelter?.notes && `기타 ${shelter.notes}`,
-      ]
-        .filter(Boolean)
-        .join(". ") + ".";
+    try {
+      const speaking = await Speech.isSpeakingAsync();
+      if (speaking) {
+        Speech.stop();
+        return;
+      }
+      const text =
+        [
+          shelter?.name,
+          shelter?.category,
+          shelter?.address && `주소 ${shelter.address}`,
+          shelter?.phone && `전화 ${shelter.phone}`,
+          shelter?.schedule &&
+            `오늘 운영시간 ${formatTodayHours(shelter.schedule)}`,
+          shelter?.eligibility?.groups?.length &&
+            `이용 대상 ${shelter.eligibility.groups.join(", ")}`,
+          shelter?.usage?.howTo && `이용 방법 ${shelter.usage.howTo}`,
+          shelter?.usage?.procedure?.length &&
+            `이용 절차 ${shelter.usage.procedure.join(", 다음, ")}`,
+          shelter?.notes && `기타 ${shelter.notes}`,
+        ]
+          .filter(Boolean)
+          .join(". ") + ".";
 
-    if (text) {
-      Speech.speak(text, { language: "ko-KR", rate: 0.8, pitch: 0.8 });
+      if (text) {
+        Speech.speak(text, { language: "ko-KR", rate: 0.8, pitch: 0.8 });
+      }
+    } catch (error) {
+      console.error("TTS error:", error);
+      showToast("음성 재생 중 오류가 발생했습니다.");
     }
   };
 
@@ -174,7 +191,7 @@ export default function ShelterDetail({ navigation, route }: Props) {
       <View style={styles.header}>
         {/* 뒤로가기 */}
         <TouchableOpacity
-          onPress={() => navigation.navigate("Home")}
+          onPress={() => navigation.goBack()}
           style={styles.backBtn}
         >
           <MaterialIcons name="arrow-back-ios" size={24} color="black" />
@@ -223,7 +240,8 @@ export default function ShelterDetail({ navigation, route }: Props) {
             decelerationRate="fast"
             snapToInterval={ITEM_W + ITEM_GAP}
             snapToAlignment="start"
-            contentContainerStyle={{ columnGap: ITEM_GAP }}
+            contentContainerStyle={{ paddingRight: ITEM_GAP }}
+            ItemSeparatorComponent={() => <View style={{ width: ITEM_GAP }} />}
             renderItem={({ item }) => (
               <View style={{ width: ITEM_W }}>
                 <Image
@@ -286,7 +304,7 @@ export default function ShelterDetail({ navigation, route }: Props) {
             <MaterialIcons name="schedule" size={18} color="#475467" />
             <Text style={styles.infoLabel}>운영시간:</Text>
             <Text style={styles.infoValue}>
-              {formatTodayHours(shelter.schedule)}
+              {formatTodayHours(shelter?.schedule ?? ({} as Schedule))}
             </Text>
           </View>
 
@@ -295,7 +313,7 @@ export default function ShelterDetail({ navigation, route }: Props) {
             <MaterialIcons name="groups" size={18} color="#475467" />
             <Text style={styles.infoLabel}>이용 대상:</Text>
             <Text style={styles.infoValue}>
-              {(shelter.eligibility?.groups || []).join(", ") || "-"}
+              {(shelter?.eligibility?.groups || []).join(", ") || "-"}
             </Text>
           </View>
 
@@ -303,7 +321,7 @@ export default function ShelterDetail({ navigation, route }: Props) {
           <View style={styles.infoRow}>
             <MaterialIcons name="check-circle" size={18} color="#475467" />
             <Text style={styles.infoLabel}>이용 방법:</Text>
-            <Text style={styles.infoValue}>{shelter.usage?.howTo || "-"}</Text>
+            <Text style={styles.infoValue}>{shelter?.usage?.howTo || "-"}</Text>
           </View>
 
           {/* 이용 절차 */}
@@ -315,7 +333,7 @@ export default function ShelterDetail({ navigation, route }: Props) {
             />
             <Text style={styles.infoLabel}>이용 절차:</Text>
             <Text style={styles.infoValue}>
-              {(shelter.usage?.procedure || []).join(" → ") || "-"}
+              {(shelter?.usage?.procedure || []).join(" → ") || "-"}
             </Text>
           </View>
 
@@ -323,7 +341,7 @@ export default function ShelterDetail({ navigation, route }: Props) {
           <View style={styles.infoRow}>
             <MaterialIcons name="eco" size={18} color="#475467" />
             <Text style={styles.infoLabel}>기타:</Text>
-            <Text style={styles.infoValue}>{shelter.notes || "-"}</Text>
+            <Text style={styles.infoValue}>{shelter?.notes || "-"}</Text>
           </View>
         </View>
       </ScrollView>
@@ -426,7 +444,7 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
   },
   infoLabel: { color: "#475467", marginLeft: 6, marginRight: 8, fontSize: 13 },
-  infoValue: { flex: 1, color: "#101828" }, // 길면 자동 줄바꿈
+  infoValue: { flex: 1, color: "#101828" },
   infoAction: { paddingHorizontal: 6, paddingVertical: 4 },
   ttsBtn: {
     width: 36,
@@ -437,6 +455,6 @@ const styles = StyleSheet.create({
     borderColor: "#111827",
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#fff", // 꽉 찬 검정 원이 좋으면 "#111827"로 바꾸고 아이콘 색을 "#fff"로
+    backgroundColor: "#fff",
   },
 });

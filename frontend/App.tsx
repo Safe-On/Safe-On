@@ -1,5 +1,4 @@
 // App.tsx
-/*
 import React, { useCallback, useEffect, useState } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler"; // 추가
 import * as SplashScreen from "expo-splash-screen";
@@ -67,7 +66,7 @@ export default function App() {
   return (
     <NavigationContainer>
       <Stack.Navigator
-        initialRouteName="Star"
+        initialRouteName="BottomTabs"
         screenOptions={{ headerShown: false }}
       >
         <Stack.Screen name="ProfileSetup" component={ProfileSetup} />

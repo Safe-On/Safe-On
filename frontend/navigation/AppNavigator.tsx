@@ -1,10 +1,7 @@
 // navigation/AppNavigator.tsx
 import React from "react";
 import { NavigationContainer } from "@react-navigation/native";
-import {
-  createNativeStackNavigator,
-  NativeStackScreenProps,
-} from "@react-navigation/native-stack";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
 import BottomTabNavigator from "./BottomTabNavigator"; // 경로 확인
 import FirstScreen from "../screens/FirstScreen";
@@ -20,7 +17,7 @@ export type RootStackParamList = {
   First: undefined;
   Permission: undefined;
   BottomTabs: { screen: "Home" | "Map" | "Settings" };
-  ShelterDetail: { shelterId: string } | undefined; // 필요하면 파라미터 타입 맞춰
+  ShelterDetail: { shelterId: string }; // 필요하면 파라미터 타입 맞춰
   Profile: undefined;
   Signup: undefined;
   Login: undefined;
