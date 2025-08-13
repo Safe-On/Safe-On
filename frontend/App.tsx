@@ -1,5 +1,4 @@
 // App.tsx
-/*
 import React, { useCallback, useEffect, useState } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler"; // 추가
 import * as SplashScreen from "expo-splash-screen";
@@ -48,15 +47,11 @@ import Home from "./screens/Home";
 import AddShelter from "./screens/AddShelter";
 import BottomTabNavigator from "./navigation/BottomTabNavigator";
 import Profile from "./screens/Profile";
-import ShelterDetail from "./screens/ShelterDetail";
 
 export type RootStackParamList = {
   BottomTabs: undefined;
   Profile: undefined;
   AddShelter: undefined;
-  ProfileSetup: undefined;
-  Home: undefined;
-  ShelterDetail: { shelterId: string } | undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -65,7 +60,7 @@ export default function App() {
   return (
     <NavigationContainer>
       <Stack.Navigator
-        initialRouteName="ShelterDetail"
+        initialRouteName="BottomTabs"
         screenOptions={{ headerShown: false }}
       >
         <Stack.Screen name="ProfileSetup" component={ProfileSetup} />
@@ -73,11 +68,6 @@ export default function App() {
         <Stack.Screen name="AddShelter" component={AddShelter} />
         <Stack.Screen name="BottomTabs" component={BottomTabNavigator} />
         <Stack.Screen name="Profile" component={Profile} />
-        <Stack.Screen
-          name="ShelterDetail"
-          component={ShelterDetail}
-          initialParams={{ shelterId: "TEST_001" }}
-        />
       </Stack.Navigator>
     </NavigationContainer>
   );
