@@ -36,7 +36,7 @@ export default function App() {
     </GestureHandlerRootView>
   );
 }
-/*
+*/
 // 특정 스크린만 테스트 하고 싶은 경우, 아래 코드 수정해서 사용
 
 import React from "react";
@@ -47,11 +47,17 @@ import Home from "./screens/Home";
 import AddShelter from "./screens/AddShelter";
 import BottomTabNavigator from "./navigation/BottomTabNavigator";
 import Profile from "./screens/Profile";
+import ShelterDetail from "./screens/ShelterDetail";
+import Star from "./screens/Star";
 
 export type RootStackParamList = {
   BottomTabs: undefined;
   Profile: undefined;
   AddShelter: undefined;
+  ProfileSetup: undefined;
+  Home: undefined;
+  ShelterDetail: { shelterId: string } | undefined;
+  Star: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -68,8 +74,12 @@ export default function App() {
         <Stack.Screen name="AddShelter" component={AddShelter} />
         <Stack.Screen name="BottomTabs" component={BottomTabNavigator} />
         <Stack.Screen name="Profile" component={Profile} />
+        <Stack.Screen
+          name="Star"
+          component={Star}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );
 }
-*/
+

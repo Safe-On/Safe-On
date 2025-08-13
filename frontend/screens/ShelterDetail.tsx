@@ -258,7 +258,7 @@ export default function ShelterDetail() {
             }}
           />
           <View style={styles.pagination}>
-            {(shelter?.photos ?? []).map((_, i) => (
+            {(shelter?.photos ?? []).map((_: string, i: number) => (
               <View
                 key={i}
                 style={[styles.dot, i === current && styles.dotActive]}
