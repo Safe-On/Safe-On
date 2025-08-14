@@ -7,7 +7,6 @@ import {
   Image,
   SafeAreaView,
   TouchableOpacity,
-  Animated,
   TextInput,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
@@ -69,17 +68,19 @@ export default function Home() {
             onPress={() => navigation.navigate("Star")}
             activeOpacity={0.7}
           >
-            <Text style={styles.title}>쉼터 즐겨찾기</Text>
-            <FontAwesome name="star" size={70} color="#FFD700" />
+            <FontAwesome name="star" size={100} color="#FFD700" />
+            <Text style={[styles.title, { textAlign: "center", marginTop: 8 }]}>
+              쉼터 즐겨찾기
+            </Text>
           </TouchableOpacity>
+
           {/* 쉼터 공지 */}
           <View style={styles.cardNotice}>
             <Text style={styles.subTitle}>쉼터 공지</Text>
             {mockNotices.map((notice) => (
               <View key={notice.id} style={{ marginBottom: 8 }}>
-                <Text>
-                  {"\u00B7"}
-                  {notice.shelterName} - {notice.content}
+                <Text style={styles.noticeText}>
+                  {"\u00B7"} {notice.shelterName} - {notice.content}
                 </Text>
               </View>
             ))}
@@ -104,7 +105,7 @@ export default function Home() {
               <TouchableOpacity key={i} onPress={() => setRating(i + 1)}>
                 <FontAwesome
                   name={i < rating ? "star" : "star-o"}
-                  size={24}
+                  size={30}
                   color="#FFD700"
                 />
               </TouchableOpacity>
@@ -148,7 +149,7 @@ export default function Home() {
                         ? "checkbox-outline"
                         : "square-outline"
                     }
-                    size={24}
+                    size={30}
                     color="#34A853"
                   />
                 </TouchableOpacity>
@@ -163,7 +164,7 @@ export default function Home() {
                         ? "close-outline"
                         : "square-outline"
                     }
-                    size={24}
+                    size={30}
                     color="#EA4335"
                   />
                 </TouchableOpacity>
@@ -187,7 +188,7 @@ export default function Home() {
           </View>
 
           {/* 상세 리뷰 */}
-          <Text style={styles.label}>상세 리뷰</Text>
+          <Text style={styles.label}>이용하시면서 느낀 점을 적어주세요</Text>
           <TextInput style={styles.reviewInput} placeholder="" />
 
           {/* 저장, 취소 */}
@@ -228,7 +229,7 @@ export default function Home() {
         style={styles.floatingBtn}
         onPress={() => navigation.navigate("AddShelter")}
       >
-        <Ionicons name="add" size={36} color="#fff" />
+        <Ionicons name="add" size={40} color="#fff" />
         {!isScrolled && <Text style={styles.title}>쉼터추가</Text>}
       </TouchableOpacity>
     </SafeAreaView>
@@ -255,7 +256,7 @@ const Chip = ({
     ]}
     onPress={onPress}
   >
-    <Text style={{ color: selected ? "#34A853" : "#333", fontSize: 12 }}>
+    <Text style={{ color: selected ? "#34A853" : "#333", fontSize: 16 }}>
       {label}
     </Text>
   </TouchableOpacity>
@@ -306,28 +307,35 @@ const styles = StyleSheet.create({
     maxWidth: "100%",
   },
   favorites: {
-    flexDirection: "row",
+    flexDirection: "column",
     justifyContent: "space-between",
     padding: 20,
     marginTop: -40,
+    gap: 16,
   },
   cardFav: {
-    flex: 1,
+    width: "100%",
     marginRight: 6,
+    paddingVertical: 30,
     ...cardBase,
+    alignItems: "center",
+    justifyContent: "center",
   },
   cardNotice: {
-    flex: 2,
-    marginLeft: 6,
+    width: "100%",
     ...cardBase,
   },
   title: {
     fontWeight: "bold",
-    marginBottom: 8,
-    fontSize: 14,
+    marginBottom: 4,
+    fontSize: 20,
+  },
+  noticeText: {
+    fontSize: 18,
+    lineHeight: 22,
   },
   bullet: {
-    fontSize: 13,
+    fontSize: 16,
     marginBottom: 4,
   },
   reviewBox: {
@@ -362,19 +370,20 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 8,
     marginBottom: 12,
+    fontSize: 16,
   },
   subTitle: {
     fontWeight: "bold",
     marginBottom: 8,
-    fontSize: 14,
+    fontSize: 18,
   },
   shelterName: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: "600",
     marginBottom: 4,
   },
   label: {
-    fontSize: 13,
+    fontSize: 16,
     marginTop: 8,
     marginBottom: 4,
   },
@@ -386,6 +395,7 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
     paddingHorizontal: 8,
     marginBottom: 8,
+    fontSize: 16,
   },
   reviewInput: {
     borderWidth: 1,
@@ -394,6 +404,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 50,
     marginBottom: 12,
+    fontSize: 16,
   },
   chipsRow: {
     flexDirection: "row",
@@ -403,8 +414,8 @@ const styles = StyleSheet.create({
   chip: {
     borderWidth: 1,
     borderRadius: 14,
-    paddingVertical: 4,
-    paddingHorizontal: 10,
+    paddingVertical: 8,
+    paddingHorizontal: 15,
     marginRight: 8,
   },
   checkRow: {
@@ -422,7 +433,7 @@ const styles = StyleSheet.create({
   checkLabel: {
     marginBottom: 4,
     marginLeft: 4,
-    fontSize: 14,
+    fontSize: 20,
     color: "#333",
   },
 
@@ -431,9 +442,9 @@ const styles = StyleSheet.create({
     bottom: 30,
     right: 20,
     backgroundColor: "#34A853",
-    width: 60,
-    height: 60,
-    borderRadius: 30,
+    width: 70,
+    height: 70,
+    borderRadius: 40,
     justifyContent: "center",
     alignItems: "center",
     elevation: 6,
@@ -454,7 +465,7 @@ const styles = StyleSheet.create({
   },
   bodyText: {
     marginBottom: 8,
-    fontSize: 14,
+    fontSize: 18,
   },
   actionBtn: {
     paddingHorizontal: 20,
@@ -463,7 +474,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 5,
   },
   actionBtnText: {
-    fontSize: 14,
+    fontSize: 18,
     fontWeight: "bold",
     color: "#333",
   },
