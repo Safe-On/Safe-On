@@ -1,4 +1,5 @@
 // App.tsx
+/*
 import React, { useCallback, useEffect, useState } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler"; // 추가
 import * as SplashScreen from "expo-splash-screen";
@@ -36,7 +37,8 @@ export default function App() {
     </GestureHandlerRootView>
   );
 }
-*/
+  */
+
 // 특정 스크린만 테스트 하고 싶은 경우, 아래 코드 수정해서 사용
 
 import React from "react";
@@ -49,6 +51,7 @@ import BottomTabNavigator from "./navigation/BottomTabNavigator";
 import Profile from "./screens/Profile";
 import ShelterDetail from "./screens/ShelterDetail";
 import Star from "./screens/Star";
+import SHome from "./screens/Home_Senior"
 
 export type RootStackParamList = {
   BottomTabs: undefined;
@@ -58,6 +61,7 @@ export type RootStackParamList = {
   Home: undefined;
   ShelterDetail: { shelterId: string } | undefined;
   Star: undefined;
+  SHome: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -66,7 +70,7 @@ export default function App() {
   return (
     <NavigationContainer>
       <Stack.Navigator
-        initialRouteName="BottomTabs"
+        initialRouteName="SHome"
         screenOptions={{ headerShown: false }}
       >
         <Stack.Screen name="ProfileSetup" component={ProfileSetup} />
@@ -74,12 +78,9 @@ export default function App() {
         <Stack.Screen name="AddShelter" component={AddShelter} />
         <Stack.Screen name="BottomTabs" component={BottomTabNavigator} />
         <Stack.Screen name="Profile" component={Profile} />
-        <Stack.Screen
-          name="Star"
-          component={Star}
-        />
+        <Stack.Screen name="Star" component={Star} />
+        <Stack.Screen name="SHome" component={SHome} />
       </Stack.Navigator>
     </NavigationContainer>
   );
 }
-
