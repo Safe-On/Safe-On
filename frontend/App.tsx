@@ -40,7 +40,7 @@ export default function App() {
   */
 
 // 특정 스크린만 테스트 하고 싶은 경우, 아래 코드 수정해서 사용
-
+/*
 import React from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
