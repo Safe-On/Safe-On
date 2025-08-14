@@ -15,6 +15,7 @@ type TabParamList = {
 };
 
 // Ionicons에서 사용할 아이콘 이름을 직접 명시
+// cspell:disable
 type IoniconName = "home" | "home-outline" | "map-outline" | "settings-outline";
 
 const Tab = createBottomTabNavigator<TabParamList>();
