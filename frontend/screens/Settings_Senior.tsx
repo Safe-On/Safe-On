@@ -1,6 +1,5 @@
 import React from "react";
 // cSpell:ignore Pressable
-
 import { View, StyleSheet, Pressable, Text, ScrollView } from "react-native";
 import ToggleButton from "../components/ToggleButton";
 import { useNavigation } from "@react-navigation/native";
@@ -8,7 +7,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import type { RootStackParamList } from "../navigation/AppNavigator";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
-export default function Settings() {
+export default function Settings_Senior() {
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
