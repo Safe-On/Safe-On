@@ -8,7 +8,7 @@ import type { RootStackParamList } from "../navigation/AppNavigator";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { MaterialIcons } from "@expo/vector-icons";
 
-export default function Settings() {
+export default function Settings_Senior() {
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
@@ -87,11 +87,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     width: "100%",
     paddingTop: 50,
-    paddingHorizontal: 30,
+    paddingHorizontal: 16,
   },
   title: {
     marginTop: -2,
-    fontSize: 18,
+    fontSize: 35,
     fontWeight: "700",
   },
   main: {
@@ -107,7 +107,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   buttonText: {
-    fontSize: 16,
+    fontSize: 25,
     fontWeight: "400",
   },
   backBtn: { position: "absolute", left: 16, top: 50 },
