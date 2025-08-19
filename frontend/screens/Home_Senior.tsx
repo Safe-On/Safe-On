@@ -14,7 +14,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { Ionicons, FontAwesome, MaterialIcons } from "@expo/vector-icons";
 import { mockNotices } from "../data/mockNotices";
 import { mockWeather } from "../data/mockWeather";
-import AddShelter from "./AddShelter";
+import SAdd from "./AddShelter_Senior";
 import { RootStackParamList } from "../App";
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList, "Home">;
@@ -227,7 +227,7 @@ export default function Home() {
       {/* 5. 플로팅 “쉼터 추가” 버튼 */}
       <TouchableOpacity
         style={styles.floatingBtn}
-        onPress={() => navigation.navigate("AddShelter")}
+        onPress={() => navigation.navigate("SAdd")}
       >
         <Ionicons name="add" size={40} color="#fff" />
         {!isScrolled && <Text style={styles.title}>쉼터추가</Text>}

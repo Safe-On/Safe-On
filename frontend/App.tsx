@@ -40,7 +40,7 @@ export default function App() {
   */
 
 // 특정 스크린만 테스트 하고 싶은 경우, 아래 코드 수정해서 사용
-/*
+
 import React from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
@@ -52,6 +52,7 @@ import Profile from "./screens/Profile";
 import ShelterDetail from "./screens/ShelterDetail";
 import Star from "./screens/Star";
 import SHome from "./screens/Home_Senior"
+import SAdd from "./screens/AddShelter_Senior";
 
 export type RootStackParamList = {
   BottomTabs: undefined;
@@ -62,6 +63,7 @@ export type RootStackParamList = {
   ShelterDetail: { shelterId: string } | undefined;
   Star: undefined;
   SHome: undefined;
+  SAdd: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -70,7 +72,7 @@ export default function App() {
   return (
     <NavigationContainer>
       <Stack.Navigator
-        initialRouteName="SHome"
+        initialRouteName="SAdd"
         screenOptions={{ headerShown: false }}
       >
         <Stack.Screen name="ProfileSetup" component={ProfileSetup} />
@@ -80,7 +82,9 @@ export default function App() {
         <Stack.Screen name="Profile" component={Profile} />
         <Stack.Screen name="Star" component={Star} />
         <Stack.Screen name="SHome" component={SHome} />
+        <Stack.Screen name="SAdd" component={SAdd} />
       </Stack.Navigator>
     </NavigationContainer>
   );
 }
+
