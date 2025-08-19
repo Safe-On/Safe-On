@@ -14,7 +14,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { FAVORITES_MOCK, type FavoritePlace } from "../data/mockFavorite";
 
-export default function Star() {
+export default function Star_Senior() {
   const navigation = useNavigation<any>();
   const [favorites, setFavorites] = useState<FavoritePlace[]>(FAVORITES_MOCK);
 
