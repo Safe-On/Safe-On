@@ -31,7 +31,7 @@ export default function Login({ navigation }: { navigation: any }) {
     /*
     try {
       const response = await fetch(
-        "https://fe66c90452d7.ngrok-free.app/api/login",
+        "https://400497bd061c.ngrok-free.app/api/login",
         {
           method: "POST",
           headers: {
@@ -72,9 +72,8 @@ export default function Login({ navigation }: { navigation: any }) {
         error.message || "아이디나 비밀번호를 확인해 주세요."
       );
     }
-      */
+    */
     // 백엔드 없이 테스트용 코드
-
     try {
       const profileSetupDone = await AsyncStorage.getItem("ProfileSetupDone");
       console.log("AsyncStorage - ProfileSetupDone:", profileSetupDone);

@@ -50,7 +50,7 @@ const diseaseOptions = [
   },
   {
     id: "2",
-    title: "호흡기, 심혈관 질환",
+    title: "호흡기, 심혈관 질환 및 기타 질환",
   },
   {
     id: "3",
