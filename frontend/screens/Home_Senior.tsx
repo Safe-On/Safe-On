@@ -65,7 +65,7 @@ export default function Home() {
           {/* 즐겨찾기 */}
           <TouchableOpacity
             style={styles.cardFav}
-            onPress={() => navigation.navigate("Star")}
+            onPress={() => navigation.navigate("SStar")}
             activeOpacity={0.7}
           >
             <FontAwesome name="star" size={100} color="#FFD700" />
