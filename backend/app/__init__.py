@@ -1,32 +1,34 @@
 # backend/app/__init__.py
+import os
+from urllib.parse import quote_plus
 from flask import Flask
+from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
-from backend.app.utils.db import SessionLocal
+
+db = SQLAlchemy()
 
 def create_app():
     app = Flask(__name__)
-    CORS(app)
 
-    @app.get("/")
-    def index():
-        return {
-        "status": "ok",
-        "endpoints": [
-            "/healthz",
-            "/shelters/nearby?kinds=heat,shade&lat=..&lng=..&radius=..&limit=.."
-        ]
-    }
+    app.register_blueprint(auth.bp, url_prefix="/auth")
 
-    @app.get("/healthz")
-    def healthz():
-        return {"ok": True}
+    pwd = os.getenv("DB_PASSWORD", "sewon0812^^")
+    encoded_pw = quote_plus(pwd)
+    app.config['SQLALCHEMY_DATABASE_URI'] = f'mysql+pymysql://root:{encoded_pw}@localhost:3306/safe_on'
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-    # 순환임포트 방지: 함수 내부에서 import
-    from backend.app.routers.shelters import bp_dyn
-    app.register_blueprint(bp_dyn)
+    db.init_app(app)
 
-    @app.teardown_appcontext
-    def shutdown_session(exception=None):
-        SessionLocal.remove()
+    # 모델 import 후 테이블 생성
+    with app.app_context():
+        from .models import User
+        db.create_all()
+
+    # 라우트 등록  
+    from .routers import BLUEPRINTS
+    for bp, prefix in BLUEPRINTS:
+        app.register_blueprint(bp, url_prefix=prefix)
 
     return app
+
+    

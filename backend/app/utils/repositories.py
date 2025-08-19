@@ -5,7 +5,7 @@ from typing import Iterable, List
 from sqlalchemy import Table, MetaData, select, func, and_, union_all, literal, cast, String, Float 
 from sqlalchemy.orm import Session
 from backend.app.models.shelters_map import KIND_TO_TABLE
-
+from datetime import datetime
 
 def _bbox(lat: float, lng: float, radius_m: float):
     deg_lat = radius_m / 111_320.0
@@ -71,6 +71,8 @@ def build_nearby_stmt_for_table(t: Table, kind: str, user_lat: float, user_lng: 
 
     user_pt = func.ST_SRID(func.Point(user_lng, user_lat), 4326)
     spot_pt = func.ST_SRID(func.Point(lng_f, lat_f), 4326)
+
+    # 거리 계산 
     distance = func.ST_Distance_Sphere(spot_pt, user_pt).label("distance_m")
 
     exclude = {"latitude", "longitude", "lat", "lng", "x", "y", "location", "geom", "shape"}
@@ -119,3 +121,31 @@ def get_nearby_multi_dynamic(
     # 거리 오름차순 + limit
     stmt = select(u).order_by(u.c.distance_m.asc()).limit(limit)
     return [dict(r) for r in session.execute(stmt).mappings().all()]
+
+
+# shelter_reviews 테이블에 리뷰를 삽입하는 함수 
+def insert_review(session, shelter_id, shelter_type, rating, review_text, review_name, comfort, accessibility_rating, heating_cooling_status):
+    try:
+        # 쉼터 리뷰를 DB에 삽입하는 쿼리 작성
+        new_review = {
+            "shelter_id": shelter_id,
+            "shelter_type": shelter_type,
+            "rating": rating,
+            "review_text": review_text,
+            "review_name": review_name,
+            "comfort": comfort,
+            "accessibility_rating": accessibility_rating,
+            "heating_cooling_status": heating_cooling_status,
+            "created_at": datetime.now()
+        }
+
+        session.execute("""
+            INSERT INTO shelter_reviews (shelter_id, shelter_type, rating, review_text, review_name, comfort, accessibility_rating, heating_cooling_status, created_at)
+            VALUES (:shelter_id, :shelter_type, :rating, :review_text, :review_name, :comfort, :accessibility_rating, :heating_cooling_status, :created_at)
+        """, new_review)
+
+        # 리뷰 ID 반환
+        return session.last_insert_id()
+
+    except Exception as e:
+        raise e
