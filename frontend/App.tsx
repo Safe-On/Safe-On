@@ -51,6 +51,7 @@ import Profile from "./screens/Profile";
 import ShelterDetail from "./screens/ShelterDetail";
 import Star from "./screens/Star";
 import SHome from "./screens/Home_Senior"
+import SAdd from "./screens/AddShelter_Senior";
 
 export type RootStackParamList = {
   BottomTabs: undefined;
@@ -61,6 +62,7 @@ export type RootStackParamList = {
   ShelterDetail: { shelterId: string } | undefined;
   Star: undefined;
   SHome: undefined;
+  SAdd: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -69,7 +71,7 @@ export default function App() {
   return (
     <NavigationContainer>
       <Stack.Navigator
-        initialRouteName="SHome"
+        initialRouteName="SAdd"
         screenOptions={{ headerShown: false }}
       >
         <Stack.Screen name="ProfileSetup" component={ProfileSetup} />
@@ -79,6 +81,7 @@ export default function App() {
         <Stack.Screen name="Profile" component={Profile} />
         <Stack.Screen name="Star" component={Star} />
         <Stack.Screen name="SHome" component={SHome} />
+        <Stack.Screen name="SAdd" component={SAdd} />
       </Stack.Navigator>
     </NavigationContainer>
   );

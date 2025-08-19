@@ -14,7 +14,7 @@ import * as ImagePicker from "expo-image-picker";
 import { useNavigation } from "@react-navigation/native";
 import Home from "./Home";
 
-export default function AddShelter() {
+export default function AddShelter_Senior() {
   const [images, setImages] = useState<string[]>([]);
   const [shelterName, setShelterName] = useState("");
   const [visitTime, setVisitTime] = useState("");
@@ -60,18 +60,21 @@ export default function AddShelter() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        {/* 뒤로가기 */}
+        {/* 뒤로가기 버튼 */}
         <TouchableOpacity
-          onPress={() => navigation.navigate("Home")}
           style={styles.backBtn}
+          onPress={() => navigation.navigate("SHome")}
         >
-          <MaterialIcons name="arrow-back-ios" size={24} color="black" />
+          <MaterialIcons name="arrow-back-ios" size={30} color="black" />
         </TouchableOpacity>
-        {/*1. 쉼터 추가*/}
-        <View style={styles.floatingBtn}>
-          <MaterialIcons name="add" size={30} color="#fff" />
+
+        {/* 가운데 영역 */}
+        <View style={styles.centerHeader}>
+          <View style={styles.floatingBtn}>
+            <MaterialIcons name="add" size={42} color="#fff" />
+          </View>
+          <Text style={styles.title}> 쉼터 추가</Text>
         </View>
-        <Text style={styles.title}> 쉼터 추가</Text>
       </View>
 
       <View style={styles.addBox}>
@@ -98,23 +101,23 @@ export default function AddShelter() {
           <Text style={styles.label}>냉난방 여부</Text>
           <View style={styles.checkRow}>
             <TouchableOpacity onPress={() => setClimateOption("o")}>
-                          <MaterialIcons
-                            name={
-                              climateOption === "o" ? "circle" : "check-box-outline-blank"
-                            }
-                            size={24}
-                            color="#34A853"
-                          />
-                        </TouchableOpacity>
-                        <TouchableOpacity onPress={() => setClimateOption("x")}>
-                          <MaterialIcons
-                            name={
-                              climateOption === "x" ? "close" : "check-box-outline-blank"
-                            }
-                            size={24}
-                            color="#EA4335"
-                          />
-                        </TouchableOpacity>
+              <MaterialIcons
+                name={
+                  climateOption === "o" ? "circle" : "check-box-outline-blank"
+                }
+                size={35}
+                color="#34A853"
+              />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => setClimateOption("x")}>
+              <MaterialIcons
+                name={
+                  climateOption === "x" ? "close" : "check-box-outline-blank"
+                }
+                size={35}
+                color="#EA4335"
+              />
+            </TouchableOpacity>
           </View>
         </View>
         {/* 5. 상세내용 */}
@@ -157,14 +160,21 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "flex-start",
+    justifyContent: "center",
     width: "100%",
+    height: 60,
+    marginTop: 40,
     position: "relative",
-    paddingTop: 50,
-    marginLeft: 20,
   },
+
   backBtn: {
-    marginRight: 80,
+    position: "absolute",
+    left: 20,
+  },
+
+  centerHeader: {
+    flexDirection: "row",
+    alignItems: "center",
   },
   row: {
     flexDirection: "row",
@@ -173,14 +183,14 @@ const styles = StyleSheet.create({
   title: {
     fontWeight: "bold",
     marginBottom: 0,
-    fontSize: 25,
+    fontSize: 35,
     alignItems: "center",
   },
   floatingBtn: {
     alignItems: "center",
     backgroundColor: "#34A853",
-    width: 30,
-    height: 30,
+    width: 40,
+    height: 40,
     borderRadius: 30,
   },
   addBox: {
@@ -188,23 +198,25 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 16,
     marginHorizontal: 20,
-    marginTop: 30,
+    marginTop: 10,
     shadowColor: "#000",
     shadowOpacity: 0.05,
     shadowOffset: { width: 0, height: 1 },
     shadowRadius: 2,
     elevation: 2,
+    marginBottom: 16,
   },
   searchInput: {
     borderWidth: 1,
     borderColor: "#ccc",
     borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
     marginBottom: 12,
+    fontSize: 18,
   },
   label: {
-    fontSize: 13,
+    fontSize: 20,
     marginTop: 8,
     marginBottom: 4,
   },
@@ -213,9 +225,10 @@ const styles = StyleSheet.create({
     borderColor: "#ccc",
     borderRadius: 8,
     width: 100,
-    paddingVertical: 4,
-    paddingHorizontal: 8,
+    paddingVertical: 8,
+    paddingHorizontal: 15,
     marginBottom: 8,
+    fontSize: 18,
   },
   checkRow: {
     flexDirection: "row",
@@ -234,10 +247,11 @@ const styles = StyleSheet.create({
     borderColor: "#ccc",
     borderRadius: 8,
     paddingHorizontal: 12,
-    paddingVertical: 10,
+    paddingVertical: 15,
     marginBottom: 12,
     alignItems: "center",
     justifyContent: "center",
+    fontSize: 18,
   },
   saveBtn: {
     backgroundColor: "#34A853",
@@ -248,12 +262,11 @@ const styles = StyleSheet.create({
   },
   saveText: {
     color: "#fff",
-    fontSize: 16,
+    fontSize: 25,
   },
   preview: {
     width: 200,
     height: 200,
-    marginTop: 10,
     borderRadius: 6,
   },
 });
