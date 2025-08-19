@@ -55,6 +55,7 @@ import SHome from "./screens/Home_Senior"
 import SAdd from "./screens/AddShelter_Senior";
 import SStar from "./screens/Star_Senior";
 import SSetting from "./screens/Settings_Senior"
+import Setting from "./screens/Settings";
 
 export type RootStackParamList = {
   BottomTabs: undefined;
@@ -68,6 +69,7 @@ export type RootStackParamList = {
   SAdd: undefined;
   SStar: undefined;
   SSetting: undefined;
+  Setting: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -89,6 +91,7 @@ export default function App() {
         <Stack.Screen name="SAdd" component={SAdd} />
         <Stack.Screen name="SStar" component={SStar} />
         <Stack.Screen name="SSetting" component={SSetting} />
+        <Stack.Screen name="Setting" component={Setting} />
       </Stack.Navigator>
     </NavigationContainer>
   );
