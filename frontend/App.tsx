@@ -1,5 +1,5 @@
 // App.tsx
-/*
+
 import React, { useCallback, useEffect, useState } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler"; // 추가
 import * as SplashScreen from "expo-splash-screen";
@@ -37,7 +37,6 @@ export default function App() {
     </GestureHandlerRootView>
   );
 }
-  */
 
 // 특정 스크린만 테스트 하고 싶은 경우, 아래 코드 수정해서 사용
 /*
@@ -84,3 +83,4 @@ export default function App() {
     </NavigationContainer>
   );
 }
+*/
