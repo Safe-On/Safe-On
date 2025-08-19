@@ -1,12 +1,12 @@
 import React from "react";
 // cSpell:ignore Pressable
-
-import { View, StyleSheet, Pressable, Text, ScrollView } from "react-native";
+import { View, StyleSheet, Pressable, Text, ScrollView, TouchableOpacity } from "react-native";
 import ToggleButton from "../components/ToggleButton";
 import { useNavigation } from "@react-navigation/native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import type { RootStackParamList } from "../navigation/AppNavigator";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { MaterialIcons } from "@expo/vector-icons";
 
 export default function Settings() {
   const navigation =
@@ -24,6 +24,13 @@ export default function Settings() {
   return (
     <SafeAreaView style={styles.SafeAreaView} edges={["top", "left", "right"]}>
       <View style={styles.header}>
+        {/* 뒤로가기 */}
+        <TouchableOpacity
+          onPress={() => navigation.goBack()}
+          style={styles.backBtn}
+        >
+          <MaterialIcons name="arrow-back-ios" size={24} color="black" />
+        </TouchableOpacity>
         <Text style={styles.title}>설정</Text>
       </View>
       <View style={styles.container}>
@@ -75,12 +82,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
   header: {
-    paddingTop: 8,
-    paddingBottom: 12,
+    flexDirection: "row",
     alignItems: "center",
-    borderBottomWidth: 1,
-    borderBottomColor: "#eaeaea",
-    height: 42,
+    justifyContent: "center",
+    width: "100%",
+    paddingTop: 50,
+    paddingHorizontal: 30,
   },
   title: {
     marginTop: -2,
@@ -103,4 +110,5 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "400",
   },
+  backBtn: { position: "absolute", left: 16, top: 50 },
 });
