@@ -39,8 +39,9 @@ export default function App() {
 }
 */
 // 특정 스크린만 테스트 하고 싶은 경우, 아래 코드 수정해서 사용
-
+import "react-native-gesture-handler";
 import React from "react";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import ProfileSetup from "./screens/ProfileSetup";
@@ -55,6 +56,7 @@ import SAdd from "./screens/AddShelter_Senior";
 import SStar from "./screens/Star_Senior";
 import SSetting from "./screens/Settings_Senior"
 import Setting from "./screens/Settings";
+import SProfile from "./screens/Profile_Senior";
 
 export type RootStackParamList = {
   BottomTabs: undefined;
@@ -69,30 +71,34 @@ export type RootStackParamList = {
   SStar: undefined;
   SSetting: undefined;
   Setting: undefined;
+  SProfile: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export default function App() {
   return (
-    <NavigationContainer>
-      <Stack.Navigator
-        initialRouteName="SSetting"
-        screenOptions={{ headerShown: false }}
-      >
-        <Stack.Screen name="ProfileSetup" component={ProfileSetup} />
-        <Stack.Screen name="Home" component={Home} />
-        <Stack.Screen name="AddShelter" component={AddShelter} />
-        <Stack.Screen name="BottomTabs" component={BottomTabNavigator} />
-        <Stack.Screen name="Profile" component={Profile} />
-        <Stack.Screen name="Star" component={Star} />
-        <Stack.Screen name="SHome" component={SHome} />
-        <Stack.Screen name="SAdd" component={SAdd} />
-        <Stack.Screen name="SStar" component={SStar} />
-        <Stack.Screen name="SSetting" component={SSetting} />
-        <Stack.Screen name="Setting" component={Setting} />
-      </Stack.Navigator>
-    </NavigationContainer>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <NavigationContainer>
+        <Stack.Navigator
+          initialRouteName="SSetting"
+          screenOptions={{ headerShown: false }}
+        >
+          <Stack.Screen name="ProfileSetup" component={ProfileSetup} />
+          <Stack.Screen name="Home" component={Home} />
+          <Stack.Screen name="AddShelter" component={AddShelter} />
+          <Stack.Screen name="BottomTabs" component={BottomTabNavigator} />
+          <Stack.Screen name="Profile" component={Profile} />
+          <Stack.Screen name="Star" component={Star} />
+          <Stack.Screen name="SHome" component={SHome} />
+          <Stack.Screen name="SAdd" component={SAdd} />
+          <Stack.Screen name="SStar" component={SStar} />
+          <Stack.Screen name="SSetting" component={SSetting} />
+          <Stack.Screen name="Setting" component={Setting} />
+          <Stack.Screen name="SProfile" component={SProfile} />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </GestureHandlerRootView>
   );
 }
 

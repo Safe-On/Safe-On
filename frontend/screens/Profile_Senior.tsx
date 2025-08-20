@@ -10,9 +10,9 @@ import { Ionicons } from "@expo/vector-icons";
 import type { RootStackParamList } from "../navigation/AppNavigator";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
-export default function Profile() {
+export default function Profile_Senior() {
   const navigation =
-    useNavigation<NativeStackNavigationProp<RootStackParamList, "Profile">>();
+    useNavigation<NativeStackNavigationProp<RootStackParamList, "SProfile">>();
   const [name, setName] = React.useState("");
   const [phone, setPhone] = React.useState("");
   const [age, setAge] = React.useState("");
@@ -79,7 +79,7 @@ export default function Profile() {
 
           <View style={styles.label}>
             <Text style={styles.labelText}>나이</Text>
-            <Text>{age} 세</Text>
+            <Text style={styles.subText}>{age} 세</Text>
           </View>
 
           <View style={styles.label}>
@@ -91,7 +91,7 @@ export default function Profile() {
                 AsyncStorage.setItem("disease", newVal);
               }}
             >
-              <Text>{disease}</Text>
+              <Text style={styles.subText}>{disease}</Text>
             </Pressable>
           </View>
 
@@ -104,7 +104,7 @@ export default function Profile() {
                 AsyncStorage.setItem("disability", newVal);
               }}
             >
-              <Text>{disability}</Text>
+              <Text style={styles.subText}>{disability}</Text>
             </Pressable>
           </View>
         </ScrollView>
@@ -135,16 +135,16 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderBottomWidth: 1,
     borderBottomColor: "#eaeaea",
-    height: 42,
+    height: 60,
   },
   backBtn: {
     position: "absolute",
     left: 16,
-    top: 3,
+    top: 10,
   },
   title: {
     marginTop: -4,
-    fontSize: 18,
+    fontSize: 35,
     fontWeight: "700",
   },
   main: {
@@ -160,7 +160,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   labelText: {
-    fontSize: 16,
+    fontSize: 25,
     fontWeight: "400",
   },
   inputName: {
@@ -168,7 +168,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#effaf1",
     borderRadius: 8,
     paddingHorizontal: 12,
-    fontSize: 16,
+    fontSize: 20,
     fontWeight: "400",
     width: 100,
     textAlign: "center",
@@ -178,7 +178,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#effaf1",
     borderRadius: 8,
     paddingHorizontal: 12,
-    fontSize: 16,
+    fontSize: 20,
     fontWeight: "400",
     width: 160,
     textAlign: "center",
@@ -201,7 +201,11 @@ const styles = StyleSheet.create({
 
   buttonText: {
     color: "#FFFFFF",
-    fontSize: 16,
+    fontSize: 25,
     fontWeight: "bold",
   },
+
+  subText: {
+    fontSize: 20,
+  }
 });

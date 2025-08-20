@@ -38,7 +38,7 @@ export default function Settings_Senior() {
         <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.main}>
           <Pressable
             style={styles.button}
-            onPress={() => navigation.navigate("Profile")}
+            onPress={() => navigation.navigate("SProfile")}
           >
             <Text style={styles.buttonText}>내 정보</Text>
           </Pressable>

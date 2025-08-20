@@ -14,6 +14,7 @@ import AddShelter from "../screens/AddShelter";
 import ProfileSetup from "../screens/ProfileSetup";
 import Star from "../screens/Star";
 import Star_Senior from "../screens/Star_Senior";
+import SProfile from "../screens/Profile_Senior";
 
 export type RootStackParamList = {
   First: undefined;
@@ -27,6 +28,7 @@ export type RootStackParamList = {
   ProfileSetup: undefined;
   Star: undefined;
   Star_Senior: undefined;
+  SProfile: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -49,6 +51,7 @@ export default function AppNavigator() {
         <Stack.Screen name="ProfileSetup" component={ProfileSetup} />
         <Stack.Screen name="Star" component={Star} />
         <Stack.Screen name="Star_Senior" component={Star_Senior} />
+        <Stack.Screen name="SProfile" component={SProfile} />
       </Stack.Navigator>
     </NavigationContainer>
   );
