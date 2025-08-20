@@ -5,20 +5,19 @@ import {
   Text,
   Alert,
   StyleSheet,
-  TouchableOpacity,
   Pressable,
   ActivityIndicator,
   Keyboard,
   TouchableWithoutFeedback,
 } from "react-native";
 import { useForm, Controller } from "react-hook-form";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function Signup({ navigation }: { navigation: any }) {
   const {
     control,
     handleSubmit,
     formState: { errors, isSubmitting },
+    watch,
   } = useForm({
     defaultValues: {
       email: "",
@@ -33,51 +32,23 @@ export default function Signup({ navigation }: { navigation: any }) {
     passwordConfirm: string;
   }) => {
     if (data.password !== data.passwordConfirm) {
-      Alert.alert(
-        "비밀번호 오류",
-        "비밀번호와 비밀번호 확인이 일치하지 않습니다."
-      );
+      Alert.alert("비밀번호 오류", "비밀번호와 일치하지 않습니다.");
       return;
     }
 
-    try {
-      const response = await fetch(
-        "https://400497bd061c.ngrok-free.app/api/signup",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            email: data.email,
-            password: data.password,
-          }),
-        }
-      );
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "회원가입 실패");
-      }
-
-      Alert.alert(
-        "회원가입 성공",
-        "회원가입이 완료되었습니다. 로그인 화면으로 이동합니다."
-      );
-      navigation.replace("Login");
-    } catch (error: any) {
-      Alert.alert(
-        "회원가입 실패",
-        error.message || "입력 정보를 확인해주세요."
-      );
-    }
+    navigation.navigate("ProfileSetup", {
+      email: data.email,
+      password: data.password,
+    });
   };
 
   return (
-    console.log("hello"),
-    (
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-        <View style={styles.container}>
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+      <View style={styles.container}>
+        <View style={styles.Header}>
           <Text style={styles.title}>회원가입</Text>
-
+        </View>
+        <View style={styles.body}>
           <Controller
             control={control}
             name="email"
@@ -152,7 +123,8 @@ export default function Signup({ navigation }: { navigation: any }) {
               {errors.passwordConfirm.message}
             </Text>
           )}
-
+        </View>
+        <View style={styles.footer}>
           <Pressable
             onPress={handleSubmit(onSubmit)}
             disabled={isSubmitting}
@@ -167,20 +139,12 @@ export default function Signup({ navigation }: { navigation: any }) {
             {isSubmitting ? (
               <ActivityIndicator />
             ) : (
-              <Text style={styles.registerButtonText}>회원가입</Text>
+              <Text style={styles.registerButtonText}>다음</Text>
             )}
           </Pressable>
-
-          <View style={styles.row}>
-            <TouchableOpacity onPress={() => navigation.navigate("Login")}>
-              <Text style={styles.linkText}>로그인</Text>
-            </TouchableOpacity>
-          </View>
-
-          <Text style={styles.note}>* 실제 백엔드 준비되면 API 연동</Text>
         </View>
-      </TouchableWithoutFeedback>
-    )
+      </View>
+    </TouchableWithoutFeedback>
   );
 }
 
@@ -191,11 +155,19 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     backgroundColor: "#ffffff",
   },
+  Header: {
+    flex: 0.35,
+    justifyContent: "center",
+  },
   title: {
+    marginTop: 170,
     fontSize: 24,
     fontWeight: "700",
-    marginBottom: 40,
     textAlign: "center",
+  },
+  body: {
+    flex: 0.45,
+    justifyContent: "center",
   },
   input: {
     borderRadius: 8,
@@ -245,5 +217,21 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: "#666",
     textAlign: "center",
+  },
+  startButton: {
+    backgroundColor: "#34A853",
+    padding: 15,
+    borderRadius: 8,
+    alignItems: "center",
+    justifyContent: "center",
+    width: "100%",
+    height: 60,
+  },
+  startButtonText: { color: "#fff", fontSize: 16, fontWeight: "bold" },
+  footer: {
+    flex: 0.2,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingTop: 70,
   },
 });

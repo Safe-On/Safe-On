@@ -9,82 +9,130 @@ import {
   Keyboard,
   TouchableWithoutFeedback,
   ScrollView,
+  Alert,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
+
 import type { RootStackParamList } from "../navigation/AppNavigator";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useRoute } from "@react-navigation/native";
+import { RouteProp } from "@react-navigation/native";
 
-const timeOptions = [
-  {
-    id: "1",
-    title: "10분 미만",
-    subtitle1: "이동 보조기구 사용 / 장거리 보행 불가",
-    subtitle2: "자주 휴식이 필요하거나 이동 보조기구를 사용한다.",
-  },
-  {
-    id: "2",
-    title: "10분~20분 (500m~1.5km)",
-    subtitle1: "짧은 거리만 가능",
-    subtitle2: "평지는 무리 없으나, 언덕이나 계단은 힘들다.",
-  },
-  {
-    id: "3",
-    title: "20분~30분 (1.5km~2.5km)",
-    subtitle1: "평소 걷기에 무리가 없음",
-    subtitle2: "평지를 무리 없이 걸을 수 있으며, 경사로도 천천히 오를 수 있다.",
-  },
-  {
-    id: "4",
-    title: "30분 이상 (2.5km)",
-    subtitle1: "평지, 언덕 포함 장거리 이동 가능",
-    subtitle2: "장시간 보행 가능, 등산, 장거리 산책이 가능하다.",
-  },
-];
+type ProfileSetupProps = RouteProp<RootStackParamList, "ProfileSetup">;
+export default function ProfileSetup() {
+  const route = useRoute<ProfileSetupProps>();
+  const navigation = useNavigation<any>();
+  const { email, password } = route.params;
 
-const diseaseOptions = [
-  {
-    id: "1",
-    title: "보행 보조기구 사용 (예: 휠체어, 지팡이, 보행차)",
-  },
-  {
-    id: "2",
-    title: "호흡기, 심혈관 질환 및 기타 질환",
-  },
-  {
-    id: "3",
-    title: "임신 중중",
-  },
-  {
-    id: "4",
-    title: "없음",
-  },
-];
-
-const ProfileSetup: React.FC = () => {
-  const navigation =
-    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
-  const [selectedDisease, setSelectedDisease] = useState<null | string>(null);
   const [age, setAge] = useState("");
-  const [selectedTime, setSelectedTime] = useState<null | string>(null);
+  const [healthType, setHealthType] = useState<null | number>(null);
 
-  const onPressAgree = async () => {
+  const handleCompleteSignup = async () => {
+    console.log("✅ handleCompleteSignup 함수 실행됨");
     try {
-      await AsyncStorage.setItem("ProfileSetupDone", "true");
-      await AsyncStorage.setItem("age", age);
-      await AsyncStorage.setItem("Time", selectedTime ?? "");
-      await AsyncStorage.setItem("disability", selectedDisease ?? "");
-      console.log("프로필 저장 완료:", {
-        age,
-        selectedTime,
-        selectedDisease,
-      });
-      navigation.navigate("BottomTabs", { screen: "Home" });
+      const payload = {
+        email,
+        password,
+        age: parseInt(age, 10),
+        health_type: healthType,
+      };
+
+      console.log("회원가입 시도", payload);
+      const response = await fetch(
+        "https://820e3c06e44d.ngrok-free.app/auth/signup",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email,
+            password,
+            age: parseInt(age, 10),
+            health_type: healthType,
+          }),
+        }
+      );
+
+      const contentType = response.headers.get("content-type");
+      if (!response.ok) {
+        const errorText = await response.text(); // 한 번만 읽기
+        console.error("HTML 응답:", errorText);
+        throw new Error("회원가입에 실패했습니다."); // Alert 용
+      }
+
+      if (contentType && contentType.includes("application/json")) {
+        const data = await response.json();
+        console.log("회원가입 성공 응답:", data);
+        Alert.alert("회원가입 완료");
+        navigation.navigate("Login");
+      } else {
+        const text = await response.text();
+        console.error("예상치 못한 응답:", text);
+        throw new Error("예상치 못한 응답입니다.");
+      }
     } catch (error) {
-      console.error("프로필 완료 상태 저장 실패:", error);
+      console.error("회원가입 중 오류:", error);
     }
   };
+  const healthTypeOptions = [
+    {
+      id: 1,
+      title: "[유형 A-1]",
+      subtitle1: "경증 장애 (급성 호흡기 장애, 경미한 보행 장애 등)",
+      subtitle2: "0~1.5km",
+    },
+    {
+      id: 2,
+      title: "[유형 A-2]",
+      subtitle1: "중증 장애 (만성 호흡기 장애, 보행 보조기구 사용 등)",
+      subtitle2: "0~0.5km",
+    },
+    {
+      id: 3,
+      title: "[유형 B-1]",
+      subtitle1: "경증 질환 (급성 호흡기 질환, 경미한 질환 등)",
+      subtitle2: "0~2km",
+    },
+    {
+      id: 4,
+      title: "[유형 B-2]",
+      subtitle1: "중증 질환 (만성 호흡기 질환, 보행 보조기구 사용 등)",
+      subtitle2: "0~2km",
+    },
+    {
+      id: 5,
+      title: "[유형 C-1]",
+      subtitle1: "80세 미만 노인 (65~79세)",
+      subtitle2: "0~2.5km",
+    },
+    {
+      id: 6,
+      title: "[유형 C-2]",
+      subtitle1: "80세 이상 노인",
+      subtitle2: "0~1.5km",
+    },
+    {
+      id: 7,
+      title: "[유형 D-1]",
+      subtitle1: "임신 초기",
+      subtitle2: "0~2.5km",
+    },
+    {
+      id: 8,
+      title: "[유형 D-2]",
+      subtitle1: "임신 후기",
+      subtitle2: "0~1.5km",
+    },
+    {
+      id: 9,
+      title: "[유형 E]",
+      subtitle1: "해당 사항 없음",
+      subtitle2: "이동거리 제한 없음",
+    },
+  ];
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
@@ -112,13 +160,13 @@ const ProfileSetup: React.FC = () => {
             <Text style={styles.sectionTitle}>
               한 번에 걸을 수 있는 시간을 알려주세요.{"\n"}*현재 건강 상태 기준
             </Text>
-            {timeOptions.map((option) => (
+            {healthTypeOptions.map((option) => (
               <Pressable
                 key={option.id}
-                onPress={() => setSelectedTime(option.id)}
+                onPress={() => setHealthType(option.id)}
                 style={[
                   styles.optionButton,
-                  selectedTime === option.id && styles.optionButtonSelected,
+                  healthType === option.id && styles.optionButtonSelected,
                 ]}
               >
                 <Text style={styles.optionTitle}>{option.title}</Text>
@@ -127,39 +175,18 @@ const ProfileSetup: React.FC = () => {
               </Pressable>
             ))}
           </View>
-
-          {/* 장애 선택 */}
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>
-              이동에 영향을 주는 건강 상태가 있나요?{"\n"}*중복 선택 가능
-            </Text>
-            {diseaseOptions.map((option) => (
-              <Pressable
-                key={option.id}
-                onPress={() => setSelectedDisease(option.id)}
-                style={[
-                  styles.optionButton,
-                  selectedDisease === option.id && styles.optionButtonSelected,
-                ]}
-              >
-                <Text style={styles.optionTitle}>{option.title}</Text>
-              </Pressable>
-            ))}
-          </View>
         </ScrollView>
 
         {/* 시작 버튼 */}
         <View style={styles.footer}>
-          <Pressable style={styles.startButton} onPress={onPressAgree}>
+          <Pressable style={styles.startButton} onPress={handleCompleteSignup}>
             <Text style={styles.startButtonText}>시작하기</Text>
           </Pressable>
         </View>
       </SafeAreaView>
     </TouchableWithoutFeedback>
   );
-};
-
-export default ProfileSetup;
+}
 
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: "#fff" },
@@ -196,7 +223,11 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     backgroundColor: "#fff",
   },
-  optionButtonSelected: { backgroundColor: "#d1f4d9", borderWidth: 0 },
+  optionButtonSelected: {
+    backgroundColor: "#d1f4d9",
+    borderWidth: 1,
+    borderColor: "#ddd",
+  },
   optionTitle: { fontSize: 16, fontWeight: "600", marginBottom: 2 },
   optionSubtitle: { fontSize: 12, color: "#666" },
   startButton: {
