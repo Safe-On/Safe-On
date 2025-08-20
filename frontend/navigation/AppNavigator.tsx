@@ -24,8 +24,8 @@ export type RootStackParamList = {
   Profile: undefined;
   Signup: undefined;
   Login: undefined;
-  AddShelter: undefined;
-  ProfileSetup: undefined;
+  AddShelter: { lat: number; lng: number };
+  ProfileSetup: { email: string; password: string };
   Star: undefined;
   Star_Senior: undefined;
   SProfile: undefined;

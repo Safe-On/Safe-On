@@ -13,6 +13,11 @@ import { FontAwesome, MaterialIcons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
 import { useNavigation } from "@react-navigation/native";
 import Home from "./Home";
+import { RootStackParamList } from "../navigation/AppNavigator";
+import { RouteProp } from "@react-navigation/native";
+import { useRoute } from "@react-navigation/native";
+
+type AddShelterRouteProp = RouteProp<RootStackParamList, "AddShelter">;
 
 export default function AddShelter() {
   const [images, setImages] = useState<string[]>([]);
@@ -21,6 +26,9 @@ export default function AddShelter() {
   const [climateOption, setClimateOption] = useState<"o" | "x" | null>(null);
   const [details, setDetails] = useState("");
   const navigation = useNavigation<any>();
+
+  const route = useRoute<AddShelterRouteProp>();
+  const { lat, lng } = route.params;
 
   const pickImage = async () => {
     // 권한 요청
@@ -51,6 +59,8 @@ export default function AddShelter() {
       climate: climateOption,
       details: details,
       photos: images,
+      lat,
+      lng,
     };
 
     console.log("저장할 데이터:", shelterData);
@@ -98,23 +108,23 @@ export default function AddShelter() {
           <Text style={styles.label}>냉난방 여부</Text>
           <View style={styles.checkRow}>
             <TouchableOpacity onPress={() => setClimateOption("o")}>
-                          <MaterialIcons
-                            name={
-                              climateOption === "o" ? "circle" : "check-box-outline-blank"
-                            }
-                            size={24}
-                            color="#34A853"
-                          />
-                        </TouchableOpacity>
-                        <TouchableOpacity onPress={() => setClimateOption("x")}>
-                          <MaterialIcons
-                            name={
-                              climateOption === "x" ? "close" : "check-box-outline-blank"
-                            }
-                            size={24}
-                            color="#EA4335"
-                          />
-                        </TouchableOpacity>
+              <MaterialIcons
+                name={
+                  climateOption === "o" ? "circle" : "check-box-outline-blank"
+                }
+                size={24}
+                color="#34A853"
+              />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => setClimateOption("x")}>
+              <MaterialIcons
+                name={
+                  climateOption === "x" ? "close" : "check-box-outline-blank"
+                }
+                size={24}
+                color="#EA4335"
+              />
+            </TouchableOpacity>
           </View>
         </View>
         {/* 5. 상세내용 */}

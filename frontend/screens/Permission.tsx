@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { View, Text, Alert, Pressable, StyleSheet } from "react-native";
 import * as Location from "expo-location";
 import * as Notifications from "expo-notifications";
@@ -15,6 +15,32 @@ const Permission: React.FC = () => {
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const [isRequesting, setIsRequesting] = useState(false);
+
+  useEffect(() => {
+    const checkPermissions = async () => {
+      const [cam, noti, loc] = await Promise.all([
+        ImagePicker.getCameraPermissionsAsync(),
+        Notifications.getPermissionsAsync(),
+        Location.getForegroundPermissionsAsync(),
+      ]);
+
+      if (
+        cam.status === "granted" &&
+        noti.status === "granted" &&
+        loc.status === "granted"
+      ) {
+        await AsyncStorage.setItem("PermissionAgreed", "true");
+        navigation.replace("Login");
+      } else {
+        const agreed = await AsyncStorage.getItem("PermissionAgreed");
+        if (agreed === "true") {
+          navigation.replace("Login");
+        }
+      }
+    };
+
+    checkPermissions();
+  }, []);
 
   const requestImagePickerPermission = async (): Promise<boolean> => {
     const { status } = await ImagePicker.requestCameraPermissionsAsync();
@@ -51,10 +77,13 @@ const Permission: React.FC = () => {
       !(await requestNotificationPermission()) ||
       !(await requestLocationPermission())
     ) {
+      console.log("권한 요청 실패");
       setIsRequesting(false);
       return;
     }
     await AsyncStorage.setItem("PermissionAgreed", "true");
+    const check = await AsyncStorage.getItem("PermissionAgreed");
+    console.log("저장 확인:", check);
     setIsRequesting(false);
     navigation.navigate("Login");
   };

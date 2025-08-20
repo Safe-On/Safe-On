@@ -28,10 +28,9 @@ export default function Login({ navigation }: { navigation: any }) {
 
   const onSubmit = async (data: { email: string; password: string }) => {
     // 백엔드 연동한 실제 사용 코드
-    /*
     try {
       const response = await fetch(
-        "https://400497bd061c.ngrok-free.app/api/login",
+        "https://820e3c06e44d.ngrok-free.app/auth/login",
         {
           method: "POST",
           headers: {
@@ -56,27 +55,11 @@ export default function Login({ navigation }: { navigation: any }) {
 
       await AsyncStorage.setItem("LoggedIn", "true");
 
-      // ProfileSetup 완료 여부 확인
-      const profileSetupDone = await AsyncStorage.getItem("ProfileSetupDone");
+      navigation.navigate("BottomTabs", { screen: "Home" });
 
-      if (profileSetupDone === "true") {
-        // 이미 프로필 설정한 사용자 → 홈으로
-        navigation.navigate("BottomTabs", { screen: "Home" });
-      } else {
-        // 아직 프로필 설정 안한 사용자 → 프로필 설정 화면으로
-        navigation.navigate("ProfileSetup");
-      }
-    } catch (error: any) {
-      Alert.alert(
-        "로그인 실패",
-        error.message || "아이디나 비밀번호를 확인해 주세요."
-      );
-    }
-    */
-    // 백엔드 없이 테스트용 코드
+      // 백엔드 없이 테스트용 코드
+      /*
     try {
-      const profileSetupDone = await AsyncStorage.getItem("ProfileSetupDone");
-      console.log("AsyncStorage - ProfileSetupDone:", profileSetupDone);
       // ✅ 여기부터는 테스트용 로직
       console.log("입력된 이메일:", data.email);
       console.log("입력된 비밀번호:", data.password);
@@ -88,13 +71,14 @@ export default function Login({ navigation }: { navigation: any }) {
 
       // AsyncStorage에 로그인 상태 저장
       await AsyncStorage.setItem("LoggedIn", "true");
-
-      // 프로필 설정 여부 확인
-      if (profileSetupDone === "true") {
-        navigation.navigate("BottomTabs", { screen: "Home" });
-      } else {
-        navigation.navigate("ProfileSetup");
-      }
+      navigation.replace("BottomTabs", { screen: "Home" });
+    } catch (error: any) {
+      Alert.alert(
+        "로그인 실패",
+        error.message || "아이디나 비밀번호를 확인해 주세요."
+      );
+    }
+      */
     } catch (error: any) {
       Alert.alert(
         "로그인 실패",
