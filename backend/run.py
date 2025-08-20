@@ -1,10 +1,12 @@
-# 실행방법 : bash에 "python -m backend.run" 입력 
-
-"""Module providing a function printing python version."""
 import os
+from flask import Flask
 from backend.app import create_app
 
 app = create_app()
+
+# 최상단에서 즉시 검사 (최적화 모드에서도 동작하도록 if문으로)
+if not isinstance(app, Flask):
+    raise RuntimeError(f"create_app() returned {type(app)}: {app!r}")
 
 if __name__ == "__main__":
     host = os.getenv("HOST", "0.0.0.0")
