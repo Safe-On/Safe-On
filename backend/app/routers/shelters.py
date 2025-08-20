@@ -5,6 +5,8 @@ from backend.app.utils.repositories import get_nearby_multi_dynamic
 
 bp_dyn = Blueprint("shelters_dyn", __name__, url_prefix="/shelters")
 
+bp = bp_dyn
+
 @bp_dyn.get("/nearby")
 def nearby_multi():
     q = request.args
