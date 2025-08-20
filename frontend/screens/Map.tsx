@@ -243,10 +243,29 @@ export default function Map() {
     setCategoryModalVisible(false);
   };
 
+  const [selectedCoord, setSelectedCoord] = useState<{
+    lat: number;
+    lng: number;
+  } | null>(null);
   return (
     <SafeAreaView style={{ flex: 1 }}>
       {region && (
-        <MapView style={{ flex: 1 }} region={region} showsUserLocation>
+        <MapView
+          style={{ flex: 1 }}
+          region={region}
+          showsUserLocation
+          onLongPress={(e) => {
+            const { latitude, longitude } = e.nativeEvent.coordinate;
+            console.log("Long press coordinates:", latitude, longitude);
+            setSelectedCoord({ lat: latitude, lng: longitude });
+          }}
+          onPress={() => {
+            // 다른 곳을 탭하면 마커/버튼 제거
+            if (selectedCoord) {
+              setSelectedCoord(null);
+            }
+          }}
+        >
           <Marker
             coordinate={{
               latitude: region.latitude,
@@ -267,7 +286,37 @@ export default function Map() {
               pinColor="green"
             />
           ))}
+          {selectedCoord && (
+            <Marker
+              coordinate={{
+                latitude: selectedCoord.lat,
+                longitude: selectedCoord.lng,
+              }}
+              title="선택된 위치"
+              pinColor="red"
+            />
+          )}
         </MapView>
+      )}
+
+      {selectedCoord && (
+        <View style={{ position: "absolute", top: 120, left: 140 }}>
+          <Pressable
+            style={{
+              backgroundColor: "#fff",
+              padding: 8,
+              borderRadius: 7,
+            }}
+            onPress={() => {
+              navigation.navigate("AddShelter", {
+                lat: selectedCoord.lat,
+                lng: selectedCoord.lng,
+              });
+            }}
+          >
+            <Text style={{ color: "#333" }}>쉼터 추가하기</Text>
+          </Pressable>
+        </View>
       )}
 
       {/* 검색바 */}
@@ -281,6 +330,7 @@ export default function Map() {
             paddingHorizontal: 16,
             fontSize: 15,
           }}
+          placeholderTextColor="gray"
           value={keyword}
           onChangeText={setKeyword}
         />
