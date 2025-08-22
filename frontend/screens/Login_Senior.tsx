@@ -18,7 +18,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 // import { login as apiLogin } from "../services/api"; // 백엔드 api (없으면 모킹 가능)
 console.log("Hello");
 
-export default function Login({ navigation }: { navigation: any }) {
+export default function Login_Senior({ navigation }: { navigation: any }) {
   const {
     control,
     handleSubmit,
@@ -111,7 +111,11 @@ export default function Login({ navigation }: { navigation: any }) {
               onChangeText={onChange}
               keyboardType="email-address"
               autoCapitalize="none"
-              style={[styles.input, errors.email && styles.errorInput]}
+              style={[
+                styles.input,
+                { fontSize: 20 },
+                errors.email && styles.errorInput,
+              ]}
             />
           )}
         />
@@ -133,7 +137,11 @@ export default function Login({ navigation }: { navigation: any }) {
               value={value}
               onChangeText={onChange}
               secureTextEntry
-              style={[styles.input, errors.password && styles.errorInput]}
+              style={[
+                styles.input,
+                { fontSize: 20 },
+                errors.password && styles.errorInput,
+              ]}
             />
           )}
         />
@@ -180,7 +188,7 @@ export default function Login({ navigation }: { navigation: any }) {
           }}
           style={{ marginTop: 20, padding: 10, backgroundColor: "#f00" }}
         >
-          <Text style={{ color: "#fff", textAlign: "center" }}>
+          <Text style={{ color: "#fff", textAlign: "center", fontSize: 20 }}>
             프로필 초기화
           </Text>
         </Pressable>
@@ -197,7 +205,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#ffffff",
   },
   title: {
-    fontSize: 24,
+    fontSize: 35,
     fontWeight: "700",
     marginBottom: 60,
     textAlign: "center",
@@ -231,11 +239,12 @@ const styles = StyleSheet.create({
   },
   loginButtonText: {
     color: "#fff",
-    fontSize: 16,
+    fontSize: 25,
     fontWeight: "500",
+    marginTop: -5
   },
   errorInput: { borderColor: "#e74c3c" },
-  errorText: { color: "#e74c3c", marginBottom: 8 },
+  errorText: { color: "#e74c3c", marginBottom: 8, fontSize: 20 },
   row: {
     flexDirection: "row",
     justifyContent: "center",
@@ -244,7 +253,7 @@ const styles = StyleSheet.create({
   },
   linkText: {
     color: "#34A853",
-    fontSize: 14,
+    fontSize: 20,
     fontWeight: "500",
     marginHorizontal: 6,
   },
@@ -252,7 +261,7 @@ const styles = StyleSheet.create({
     color: "#34A853",
     marginHorizontal: 6,
     fontWeight: "400",
-    fontSize: 14,
+    fontSize: 20,
   },
-  note: { marginTop: 12, fontSize: 12, color: "#666", textAlign: "center" },
+  note: { marginTop: 12, fontSize: 20, color: "#666", textAlign: "center" },
 });
