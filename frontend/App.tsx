@@ -58,6 +58,7 @@ import SSetting from "./screens/Settings_Senior"
 import Setting from "./screens/Settings";
 import SProfile from "./screens/Profile_Senior";
 import SShelterDetail from "./screens/ShelterDetail_Senior";
+import SLogin from "./screens/Login_Senior";
 
 export type RootStackParamList = {
   BottomTabs: undefined;
@@ -74,6 +75,7 @@ export type RootStackParamList = {
   Setting: undefined;
   SProfile: undefined;
   SShelterDetail: undefined;
+  SLogin: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -83,7 +85,7 @@ export default function App() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <NavigationContainer>
         <Stack.Navigator
-          initialRouteName="SShelterDetail"
+          initialRouteName="SLogin"
           screenOptions={{ headerShown: false }}
         >
           <Stack.Screen name="ProfileSetup" component={ProfileSetup} />
@@ -99,6 +101,7 @@ export default function App() {
           <Stack.Screen name="Setting" component={Setting} />
           <Stack.Screen name="SProfile" component={SProfile} />
           <Stack.Screen name="SShelterDetail" component={SShelterDetail} />
+          <Stack.Screen name="SLogin" component={SLogin} />
         </Stack.Navigator>
       </NavigationContainer>
     </GestureHandlerRootView>
