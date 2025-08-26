@@ -40,6 +40,11 @@
   "devDependencies": {
     "@babel/core": "^7.25.2",
     "@expo/config": "^11.0.13",
+    "@types/estree": "^1.0.8",
+    "@types/istanbul-lib-coverage": "^2.0.6",
+    "@types/jest": "^30.0.0",
+    "@types/json-schema": "^7.0.15",
+    "@types/node": "^24.3.0",
     "@types/react": "~19.0.10",
     "expo-module-scripts": "^4.1.10",
     "typescript": "~5.8.3"

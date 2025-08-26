@@ -1,11 +1,23 @@
 // App.tsx
-/*
+
 import React, { useCallback, useEffect, useState } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler"; // 추가
 import * as SplashScreen from "expo-splash-screen";
 import AppNavigator from "./navigation/AppNavigator";
+import {
+  SeniorModeProvider,
+  useSeniorMode,
+} from "./contexts/SeniorModeContext";
+import SeniorNavigator from "./navigation/SeniorNavigator";
+import { NavigationContainer } from "@react-navigation/native";
 
 SplashScreen.preventAutoHideAsync();
+
+function Root() {
+  const { isSenior, loading } = useSeniorMode();
+  if (loading) return null;
+  return isSenior ? <SeniorNavigator /> : <AppNavigator />;
+}
 
 export default function App() {
   const [isReady, setIsReady] = useState(false);
@@ -33,11 +45,15 @@ export default function App() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }} onLayout={onLayoutRootView}>
-      <AppNavigator />
+      <SeniorModeProvider>
+        <NavigationContainer>
+          <Root />
+        </NavigationContainer>
+      </SeniorModeProvider>
     </GestureHandlerRootView>
   );
 }
-*/
+/*
 // 특정 스크린만 테스트 하고 싶은 경우, 아래 코드 수정해서 사용
 import "react-native-gesture-handler";
 import React from "react";
@@ -107,4 +123,4 @@ export default function App() {
     </GestureHandlerRootView>
   );
 }
-
+*/
