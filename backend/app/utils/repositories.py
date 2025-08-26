@@ -61,6 +61,7 @@ def _props_json(t: Table, exclude: set) -> object:
         pairs.append(literal(c.name)); pairs.append(c)
     return func.json_object(*pairs).label("props") if pairs else literal(None).label("props")
 
+#사용자의 위도,경도 정보와 반경을 입력받아 -> SQL에서 해당 지점을 반환하는 함수
 def build_nearby_stmt_for_table(t: Table, kind: str, user_lat: float, user_lng: float,
                                 radius_m: float, min_lat: float, max_lat: float,
                                 min_lng: float, max_lng: float):

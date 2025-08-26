@@ -8,7 +8,7 @@ from . import db, models
 def create_app():
     app = Flask(__name__)
 
-    app.config["SQLALCHEMY_DATABASE_URI"] = "mysql+pymysql://root:junmin02@localhost/info"
+    app.config["SQLALCHEMY_DATABASE_URI"] = "mysql+pymysql://minseo3:sewon0812^^@localhost:3306/safe_on"
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
     db.init_app(app)

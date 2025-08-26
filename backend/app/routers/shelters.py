@@ -1,7 +1,7 @@
 # backend/app/routers/shelters.py
 from flask import Blueprint, request, jsonify
 from backend.app.utils.db import SessionLocal
-from backend.app.utils.repositories import get_nearby_multi_dynamic
+from backend.app.utils.repositories import get_nearby_multi_dynamic  #repositories.py파일에서 함수 불러오기 
 
 bp_dyn = Blueprint("shelters_dyn", __name__, url_prefix="/shelters")
 
@@ -26,3 +26,43 @@ def nearby_multi():
         return jsonify({"count": len(items), "items": items})
     finally:
         s.close()
+
+@bp_dyn.get("/detail/<table>/<int:shelter_id>")
+def detail(table, shelter_id):
+    db = SessionLocal()
+    try: 
+        if table =="heat":
+            query=""" SELECT id, facility_type_2, shelter_name, road_address, capacity, lat, long
+                FROM shelters_heat
+                WHERE id = :id
+            """
+
+        elif table=="smart":
+            query="""SELECT id, facility_name, detailed_address, lat, long
+                FROM shelters_smart
+                WHERE id = :id
+            """
+
+        elif table=="finedust":
+            query="""SELECT id, shelter_name, road_address, capacity, time, lat, long
+            FROM shelters_finedust
+            WHERE id = :id
+            """
+
+        elif table=="climate":
+            query="""SELECT id, facility_name, shelter_name, road_address, time, lat, long
+            FROM shelters_climate
+            WHERE id = :id
+            """
+        else:
+            return jsonify({"error": "Invalid table"}),400
+        
+        shelter = db.execute(query, {"id": shelter_id}).fetchone()
+
+        if shelter is None:
+            return jsonify({"error": "Not found"}),404
+        
+        return jsonify(dict(shelter))
+    
+    finally:
+        db.close()
