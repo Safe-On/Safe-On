@@ -11,6 +11,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import MapView, { Marker } from "react-native-maps";
 import * as Location from "expo-location";
+import * as Haptics from "expo-haptics";
 import axios from "axios";
 import { getDistance } from "geolib";
 import { Modalize } from "react-native-modalize";
@@ -37,6 +38,7 @@ export type PlaceType = {
   x: string;
   y: string;
   category: string;
+  kind: string;
 };
 
 export type BackendPlaceType = {
@@ -104,6 +106,7 @@ export default function Map() {
     })();
   }, []);
 
+  /*
   // 검색 키워드가 변경되면 카카오 API를 호출 (카테고리 기능과 분리)
   useEffect(() => {
     if (!region || !keyword.trim()) return;
@@ -146,7 +149,7 @@ export default function Map() {
       setLoading(false);
     }
   };
-
+*/
   // 중복 장소 제거
   const uniqueByCoords = (items: BackendPlaceType[]) => {
     const seen = new Set();
@@ -168,7 +171,7 @@ export default function Map() {
       const kinds = ["heat", "climate", "smart", "finedust"];
 
       const res = await axios.get(
-        "https://400497bd061c.ngrok-free.app/shelters/nearby",
+        "https://e80451de14f5.ngrok-free.app/shelters/nearby",
         {
           params: {
             kinds: kinds.join(","),
@@ -218,6 +221,7 @@ export default function Map() {
           x: p.longitude.toString(),
           y: p.latitude.toString(),
           category: category,
+          kind: p.kind,
         };
       });
 
@@ -256,7 +260,7 @@ export default function Map() {
           showsUserLocation
           onLongPress={(e) => {
             const { latitude, longitude } = e.nativeEvent.coordinate;
-            console.log("Long press coordinates:", latitude, longitude);
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
             setSelectedCoord({ lat: latitude, lng: longitude });
           }}
           onPress={() => {
@@ -307,7 +311,8 @@ export default function Map() {
               padding: 8,
               borderRadius: 7,
             }}
-            onPress={() => {
+            onPress={async () => {
+              await Haptics.selectionAsync();
               navigation.navigate("AddShelter", {
                 lat: selectedCoord.lat,
                 lng: selectedCoord.lng,
@@ -396,7 +401,10 @@ export default function Map() {
                   borderRadius: 8,
                 }}
                 onPress={() =>
-                  navigation.navigate("ShelterDetail", { shelterId: item.id })
+                  navigation.navigate("ShelterDetail", {
+                    shelterId: item.id,
+                    table: item.kind,
+                  })
                 }
               >
                 <Text style={{ color: "#fff" }}>상세보기</Text>
