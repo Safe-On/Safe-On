@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   StyleSheet,
@@ -8,27 +8,31 @@ import {
   TouchableOpacity,
   Image,
   ScrollView,
+  TouchableWithoutFeedback,
+  Keyboard,
 } from "react-native";
-import { FontAwesome, MaterialIcons } from "@expo/vector-icons";
+import { MaterialIcons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
 import { useNavigation } from "@react-navigation/native";
-import Home from "./Home";
 import { RootStackParamList } from "../navigation/AppNavigator";
 import { RouteProp } from "@react-navigation/native";
 import { useRoute } from "@react-navigation/native";
-
+import axios from "axios";
+import { KAKAO_REST_API_KEY } from "@env";
 type AddShelterRouteProp = RouteProp<RootStackParamList, "AddShelter">;
 
 export default function AddShelter() {
-  const [images, setImages] = useState<string[]>([]);
+  const [facilityType, setFacilityType] = useState("");
   const [shelterName, setShelterName] = useState("");
-  const [visitTime, setVisitTime] = useState("");
-  const [climateOption, setClimateOption] = useState<"o" | "x" | null>(null);
-  const [details, setDetails] = useState("");
-  const navigation = useNavigation<any>();
+  const [roadAddress, setRoadAddress] = useState("");
+  const [time, setTime] = useState("");
+  const [capacity, setCapacity] = useState("");
+  const [note, setNote] = useState("");
+  const [photos, setPhotos] = useState<string[]>([]);
 
   const route = useRoute<AddShelterRouteProp>();
   const { lat, lng } = route.params;
+  const navigation = useNavigation<any>();
 
   const pickImage = async () => {
     // 권한 요청
@@ -48,114 +52,163 @@ export default function AddShelter() {
     });
 
     if (!result.canceled) {
-      setImages((prev) => [...prev, result.assets[0].uri]);
+      setPhotos((prev) => [...prev, result.assets[0].uri]);
     }
   };
 
-  const handleSave = () => {
-    const shelterData = {
-      name: shelterName,
-      time: visitTime,
-      climate: climateOption,
-      details: details,
-      photos: images,
-      lat,
-      lng,
-    };
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await axios.get(
+          "https://dapi.kakao.com/v2/local/geo/coord2address.json",
+          {
+            params: { x: lng, y: lat },
+            headers: { Authorization: `KakaoAK ${KAKAO_REST_API_KEY}` },
+          }
+        );
+        const doc = res.data?.documents?.[0];
+        const road =
+          doc?.road_address?.address_name || doc?.address?.address_name;
+        if (road) {
+          setRoadAddress((prev) => prev || road);
+        }
+      } catch (e) {
+        console.error("역지오코딩 실패:", e);
+      }
+    })();
+  }, [lat, lng]);
 
-    console.log("저장할 데이터:", shelterData);
-    alert("저장완료 (현재는 콘솔에만 저장)");
+  const handleSave = async () => {
+    if (!shelterName.trim()) {
+      alert("쉼터 이름을 입력하세요.");
+      return;
+    }
+    const formData = new FormData();
+    formData.append("facility_type_2", facilityType);
+    formData.append("shelter_name", shelterName);
+    formData.append("road_address", roadAddress);
+    formData.append("time", time);
+    formData.append("capacity", capacity);
+    formData.append("note", note);
+    formData.append("lat", String(lat));
+    formData.append("lng", String(lng));
+    photos.forEach((uri, index) => {
+      formData.append("photos", {
+        uri,
+        type: "image/jpeg", // PNG면 "image/png"
+        name: `photo_${index}.jpg`,
+      } as any);
+    });
+    try {
+      const response = await fetch("http://<서버주소>/add_shelter", {
+        method: "POST",
+        body: formData,
+      });
+      const result = await response.json();
+      console.log("서버 응답:", result);
+      alert("저장 완료!");
+      navigation.navigate("Map");
+    } catch (error) {
+      console.error("업로드 에러:", error);
+      alert("업로드 실패");
+    }
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        {/* 뒤로가기 */}
-        <TouchableOpacity
-          onPress={() => navigation.navigate("Home")}
-          style={styles.backBtn}
-        >
-          <MaterialIcons name="arrow-back-ios" size={24} color="black" />
-        </TouchableOpacity>
-        {/*1. 쉼터 추가*/}
-        <View style={styles.floatingBtn}>
-          <MaterialIcons name="add" size={30} color="#fff" />
-        </View>
-        <Text style={styles.title}> 쉼터 추가</Text>
-      </View>
-
-      <View style={styles.addBox}>
-        {/* 2. 쉼터 등록 */}
-        <TextInput
-          style={styles.searchInput}
-          value={shelterName}
-          onChangeText={setShelterName}
-          placeholder="쉼터 이름 입력"
-        />
-        {/* 3. 운영시간 */}
-        <View style={styles.checkItem}>
-          {/* 방문 시간 */}
-          <Text style={styles.label}>운영 시간</Text>
-          <TextInput
-            style={styles.timeInput}
-            value={visitTime}
-            onChangeText={setVisitTime}
-            placeholder="00:00"
-          />
-        </View>
-        {/* 4. 냉난방 여부 */}
-        <View style={styles.checkItem}>
-          <Text style={styles.label}>냉난방 여부</Text>
-          <View style={styles.checkRow}>
-            <TouchableOpacity onPress={() => setClimateOption("o")}>
-              <MaterialIcons
-                name={
-                  climateOption === "o" ? "circle" : "check-box-outline-blank"
-                }
-                size={24}
-                color="#34A853"
-              />
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+      <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
+        <View style={styles.container}>
+          <View style={styles.header}>
+            {/* 0. 뒤로가기 */}
+            <TouchableOpacity
+              onPress={() => navigation.goBack()}
+              style={styles.backBtn}
+            >
+              <MaterialIcons name="arrow-back-ios" size={24} color="black" />
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => setClimateOption("x")}>
-              <MaterialIcons
-                name={
-                  climateOption === "x" ? "close" : "check-box-outline-blank"
-                }
-                size={24}
-                color="#EA4335"
+            {/* 0. 쉼터 추가*/}
+            <View style={styles.floatingBtn}>
+              <MaterialIcons name="add" size={30} color="#fff" />
+            </View>
+            <Text style={styles.title}> 쉼터 추가</Text>
+          </View>
+          <ScrollView showsVerticalScrollIndicator={false}>
+            <View style={styles.addBox}>
+              {/* 1. 사진 등록 */}
+              <Text style={styles.label}>사진 등록</Text>
+              <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                {photos.map((uri, index) => (
+                  <Image key={index} source={{ uri }} style={styles.preview} />
+                ))}
+
+                {/* + 버튼 */}
+                <TouchableOpacity
+                  style={styles.photoAddBtn}
+                  onPress={pickImage}
+                >
+                  <MaterialIcons name="add" size={40} color="#ccc" />
+                </TouchableOpacity>
+              </ScrollView>
+              {/* 2. 쉼터 이름 */}
+              <Text style={styles.label}>쉼터 이름</Text>
+              <TextInput
+                style={styles.searchInput}
+                value={shelterName}
+                onChangeText={setShelterName}
+                placeholder="쉼터 이름 입력"
               />
+              {/* 3. 주소 */}
+              <Text style={styles.label}>주소</Text>
+              <TextInput
+                style={styles.searchInput}
+                value={roadAddress}
+                onChangeText={setRoadAddress}
+                placeholder="주소 입력"
+              />
+              {/* 4. 쉼터 유형 */}
+              <Text style={styles.label}>쉼터 유형</Text>
+              <TextInput
+                style={styles.searchInput}
+                value={facilityType}
+                onChangeText={setFacilityType}
+                placeholder="쉼터 유형 입력"
+              />
+              {/* 5. 운영시간 */}
+              <Text style={styles.label}>운영 시간</Text>
+              <TextInput
+                style={styles.timeInput}
+                value={time}
+                onChangeText={setTime}
+                placeholder="00:00"
+              />
+              {/* 5. 수용인원 */}
+              <Text style={styles.label}>수용인원</Text>
+              <TextInput
+                style={styles.timeInput}
+                value={capacity}
+                onChangeText={setCapacity}
+                placeholder="인원수 입력"
+              />
+              {/* 6. 상세내용 */}
+              <Text style={styles.label}>상세 내용</Text>
+              <TextInput
+                style={[styles.detailInput, { height: 80 }]}
+                value={note}
+                onChangeText={setNote}
+                multiline
+              />
+            </View>
+          </ScrollView>
+
+          {/* 7. 작성완료 버튼 */}
+          <View style={styles.btnBox}>
+            <TouchableOpacity style={styles.saveBtn} onPress={handleSave}>
+              <Text style={styles.saveText}>저장하기</Text>
             </TouchableOpacity>
           </View>
         </View>
-        {/* 5. 상세내용 */}
-        <Text style={styles.label}>상세 내용</Text>
-        <TextInput
-          style={[styles.detailInput, { height: 80 }]}
-          value={details}
-          onChangeText={setDetails}
-          multiline
-        />
-        {/* 6. 사진 등록 */}
-        <Text style={styles.label}>사진 등록</Text>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-          {images.map((uri, index) => (
-            <Image key={index} source={{ uri }} style={styles.preview} />
-          ))}
-
-          {/* + 버튼 */}
-          <TouchableOpacity style={styles.addBox} onPress={pickImage}>
-            <MaterialIcons name="add" size={40} color="#ccc" />
-          </TouchableOpacity>
-        </ScrollView>
-
-        {/* 7. 작성완료 버튼 */}
-        <TouchableOpacity style={styles.saveBtn} onPress={handleSave}>
-          <Text style={styles.saveText}>저장하기</Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* 8. 하단바 */}
-    </SafeAreaView>
+      </SafeAreaView>
+    </TouchableWithoutFeedback>
   );
 }
 
@@ -163,6 +216,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
+    padding: 16,
   },
   header: {
     flexDirection: "row",
@@ -170,8 +224,7 @@ const styles = StyleSheet.create({
     justifyContent: "flex-start",
     width: "100%",
     position: "relative",
-    paddingTop: 50,
-    marginLeft: 20,
+    marginLeft: 2,
   },
   backBtn: {
     marginRight: 80,
@@ -197,13 +250,19 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     borderRadius: 10,
     padding: 16,
-    marginHorizontal: 20,
-    marginTop: 30,
+    marginTop: 15,
     shadowColor: "#000",
     shadowOpacity: 0.05,
     shadowOffset: { width: 0, height: 1 },
     shadowRadius: 2,
     elevation: 2,
+  },
+  photoAddBtn: {
+    marginTop: 12,
+    alignItems: "center",
+    width: 70,
+    height: 70,
+    borderRadius: 30,
   },
   searchInput: {
     borderWidth: 1,
@@ -249,17 +308,26 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
+  btnBox: {
+    marginTop: 20,
+    alignItems: "center",
+    justifyContent: "center",
+  },
   saveBtn: {
     backgroundColor: "#34A853",
-    paddingVertical: 10,
-    paddingHorizontal: 15,
-    borderRadius: 6,
+    padding: 16,
+    borderRadius: 8,
     alignItems: "center",
+    justifyContent: "center",
+    width: "100%",
+    height: 60,
   },
   saveText: {
     color: "#fff",
     fontSize: 16,
+    fontWeight: "bold",
   },
+
   preview: {
     width: 200,
     height: 200,
