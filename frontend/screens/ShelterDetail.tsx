@@ -98,7 +98,6 @@ export default function ShelterDetail() {
         const data: ApiShelter = await res.json();
         if (mounted) setShelter(mapApiShelter(data, table as any));
       } catch (e) {
-        console.error("상세 불러오기 실패:", e);
         Alert.alert("오류", "쉼터 정보를 불러오지 못했습니다.");
       } finally {
         if (mounted) setLoading(false);
