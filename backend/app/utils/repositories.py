@@ -4,7 +4,7 @@ import math
 from typing import Iterable, List
 from sqlalchemy import Table, MetaData, select, func, and_, union_all, literal, cast, String, Float 
 from sqlalchemy.orm import Session
-from backend.app.models.shelters_map import KIND_TO_TABLE
+from ..models.shelters_map import KIND_TO_TABLE
 from datetime import datetime
 
 def _bbox(lat: float, lng: float, radius_m: float):
