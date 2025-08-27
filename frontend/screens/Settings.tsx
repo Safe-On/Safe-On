@@ -1,12 +1,13 @@
 import React from "react";
 // cSpell:ignore Pressable
-import { View, StyleSheet, Pressable, Text, ScrollView, TouchableOpacity } from "react-native";
+import { View, StyleSheet, Pressable, Text, ScrollView, TouchableOpacity, Switch } from "react-native";
 import ToggleButton from "../components/ToggleButton";
 import { useNavigation } from "@react-navigation/native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import type { RootStackParamList } from "../navigation/AppNavigator";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { MaterialIcons } from "@expo/vector-icons";
+import { useSeniorMode } from "../contexts/SeniorModeContext";
 
 export default function Settings() {
   const navigation =
@@ -19,6 +20,14 @@ export default function Settings() {
 
   const handleLanguageChange = () => {
     setLanguage((prev) => (prev === "한국어" ? "English" : "한국어"));
+  };
+
+  const { isSenior, setSenior, loading } = useSeniorMode();
+  if (loading) return null;
+  console.log("[Settings] isSenior =", isSenior);
+
+  const onToggle = (next: boolean) => {
+    setSenior(next);
   };
 
   return (
@@ -50,7 +59,7 @@ export default function Settings() {
 
           <View style={styles.button}>
             <Text style={styles.buttonText}>시니어 모드</Text>
-            <ToggleButton value={inSeniorMode} onToggle={setInSeniorMode} />
+            <Switch value={isSenior} onValueChange={setSenior} />
           </View>
 
           <View style={styles.button}>

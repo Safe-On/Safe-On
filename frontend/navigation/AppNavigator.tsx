@@ -35,7 +35,6 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 console.log("Hello");
 export default function AppNavigator() {
   return (
-    <NavigationContainer>
       <Stack.Navigator
         initialRouteName="First"
         screenOptions={{ headerShown: false }}
@@ -53,6 +52,5 @@ export default function AppNavigator() {
         <Stack.Screen name="Star_Senior" component={Star_Senior} />
         <Stack.Screen name="SProfile" component={SProfile} />
       </Stack.Navigator>
-    </NavigationContainer>
   );
 }
