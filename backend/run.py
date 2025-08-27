@@ -1,6 +1,6 @@
 import os
 from flask import Flask
-from backend.app import create_app
+from .app.app import create_app
 
 app = create_app()
 
