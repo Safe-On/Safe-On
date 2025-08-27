@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+// ShelterDetail.tsx
+import React, { useState, useEffect } from "react";
 import {
   View,
   SafeAreaView,
@@ -9,7 +10,6 @@ import {
   Image,
   FlatList,
   Dimensions,
-  Linking,
   Platform,
   Alert,
 } from "react-native";
@@ -17,116 +17,23 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { useNavigation, useRoute, RouteProp } from "@react-navigation/native";
 import * as Speech from "expo-speech";
 import { RootStackParamList } from "../navigation/AppNavigator";
-import { SHELTERS } from "../data/mockDetail";
+import { ApiShelter, Shelter } from "./types/shelter";
+import { mapApiShelter } from "./utils/mapShelter";
 
 const SCREEN_W = Dimensions.get("window").width;
 const H_PADDING = 20;
 const ITEM_GAP = 12;
 const ITEM_W = SCREEN_W - H_PADDING * 2;
 
-const DAY_ORDER = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"] as const;
-const DAY_LABEL: Record<(typeof DAY_ORDER)[number] | "hol", string> = {
-  mon: "월",
-  tue: "화",
-  wed: "수",
-  thu: "목",
-  fri: "금",
-  sat: "토",
-  sun: "일",
-  hol: "공휴일",
-};
-
-const openDial = (phone?: string) => {
-  if (!phone) return;
-  const digits = phone.replace(/[^0-9+]/g, "");
-  Linking.openURL(`tel:${digits}`);
-};
-
-const openMap = (addr?: string) => {
-  if (!addr) return;
-  const q = encodeURIComponent(addr);
-  const url = Platform.select({
-    ios: `http://maps.apple.com/?q=${q}`,
-    android: `geo:0,0?q=${q}`,
-    default: `https://maps.google.com/?q=${q}`,
-  }) as string;
-  Linking.openURL(url);
-};
-
-function toMin(hhmm: string) {
-  const [h, m] = hhmm.split(":").map(Number);
-  return h * 60 + m;
-}
-
-type BreakTime = {
-  start: string;
-  end: string;
-};
-
-type DailySchedule = {
-  closed?: boolean;
-  open?: {
-    start: string;
-    end: string;
-  };
-  breaks?: BreakTime[];
-};
-
-type Schedule = Partial<
-  Record<(typeof DAY_ORDER)[number] | "hol", DailySchedule>
->;
-
-function isOpenNow(schedule: Schedule, date = new Date()): boolean {
-  const dayIdx = date.getDay(); // 0=Sun
-  const key = dayIdx === 0 ? "sun" : DAY_ORDER[dayIdx - 1];
-  const d = schedule?.[key];
-  if (!d || d.closed || !d.open) return false;
-
-  const now = date.getHours() * 60 + date.getMinutes();
-  const start = toMin(d.open.start);
-  const end = toMin(d.open.end);
-  let open = now >= start && now < end;
-
-  if (open && d.breaks?.length) {
-    for (const b of d.breaks) {
-      if (now >= toMin(b.start) && now < toMin(b.end)) {
-        open = false;
-        break;
-      }
-    }
-  }
-  return open;
-}
-
-function formatDailyHours(d: DailySchedule | undefined) {
-  if (!d || d.closed || !d.open) return "휴무";
-  const base = `${d.open.start}–${d.open.end}`;
-  const brk = d.breaks?.length
-    ? ` (점심 ${d.breaks.map((b) => `${b.start}–${b.end}`).join(", ")})`
-    : "";
-  return base + brk;
-}
-
-function formatTodayHours(schedule: Schedule, date = new Date()) {
-  const dayIdx = date.getDay(); // 0=Sun
-  const key = dayIdx === 0 ? "sun" : DAY_ORDER[dayIdx - 1];
-  return formatDailyHours(schedule?.[key]);
-}
-
-function weeklyHours(schedule: Schedule) {
-  return DAY_ORDER.map((k) => ({
-    day: `${DAY_LABEL[k]}요일`,
-    text: formatDailyHours(schedule?.[k]),
-  }));
-}
-
-type Shelter = (typeof SHELTERS)[keyof typeof SHELTERS];
+const BASE_URL = "https://e80451de14f5.ngrok-free.app";
 
 export default function ShelterDetail() {
   const navigation = useNavigation();
   const route = useRoute<RouteProp<RootStackParamList, "ShelterDetail">>();
-  const shelterId = route.params?.shelterId ?? "TEST_001";
-  const shelter = (SHELTERS as Record<string, Shelter | undefined>)[shelterId];
+  const shelterId = route.params?.shelterId!;
+  const table = route.params?.table!;
+  const [shelter, setShelter] = useState<Shelter | null>(null);
+  const [loading, setLoading] = useState(true);
   const [current, setCurrent] = useState(0);
   const [isFav, setIsFav] = useState<boolean>(false);
 
@@ -161,18 +68,12 @@ export default function ShelterDetail() {
       }
       const text =
         [
-          shelter?.name,
-          shelter?.category,
-          shelter?.address && `주소 ${shelter.address}`,
-          shelter?.phone && `전화 ${shelter.phone}`,
-          shelter?.schedule &&
-            `오늘 운영시간 ${formatTodayHours(shelter.schedule)}`,
-          shelter?.eligibility?.groups?.length &&
-            `이용 대상 ${shelter.eligibility.groups.join(", ")}`,
-          shelter?.usage?.howTo && `이용 방법 ${shelter.usage.howTo}`,
-          shelter?.usage?.procedure?.length &&
-            `이용 절차 ${shelter.usage.procedure.join(", 다음, ")}`,
-          shelter?.notes && `기타 ${shelter.notes}`,
+          shelter?.shelterName,
+          shelter?.facilityType,
+          shelter?.roadAddress && `주소 ${shelter.roadAddress}`,
+          shelter?.time && `오늘 운영시간 ${shelter.time}`,
+          shelter?.capacity && `수용 인원 ${shelter.capacity}`,
+          shelter?.note && `기타 ${shelter.note}`,
         ]
           .filter(Boolean)
           .join(". ") + ".";
@@ -185,6 +86,28 @@ export default function ShelterDetail() {
       showToast("음성 재생 중 오류가 발생했습니다.");
     }
   };
+
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        const res = await fetch(
+          `${BASE_URL}/shelters/detail/${encodeURIComponent(table)}/${encodeURIComponent(shelterId)}`
+        );
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data: ApiShelter = await res.json();
+        if (mounted) setShelter(mapApiShelter(data, table as any));
+      } catch (e) {
+        console.error("상세 불러오기 실패:", e);
+        Alert.alert("오류", "쉼터 정보를 불러오지 못했습니다.");
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    })();
+    return () => {
+      mounted = false;
+    };
+  }, [table, shelterId]);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -203,7 +126,7 @@ export default function ShelterDetail() {
       <ScrollView showsVerticalScrollIndicator={false}>
         {/* 쉼터 이름 */}
         <View style={styles.nameRow}>
-          <Text style={styles.name}>{shelter?.name ?? "-"}</Text>
+          <Text style={styles.name}>{shelter?.shelterName ?? "-"}</Text>
           {/* 즐겨찾기 */}
           <TouchableOpacity
             onPress={onToggleFavorite}
@@ -228,120 +151,77 @@ export default function ShelterDetail() {
         </View>
 
         {/* 쉼터 종류 */}
-        <Text style={styles.category}>{shelter?.category ?? "-"}</Text>
+        <Text style={styles.category}>{shelter?.facilityType ?? "-"}</Text>
 
         {/* 쉼터 사진 */}
-        <View style={{ paddingHorizontal: H_PADDING }}>
-          <FlatList
-            data={shelter?.photos ?? []}
-            keyExtractor={(_, i) => String(i)}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            decelerationRate="fast"
-            snapToInterval={ITEM_W + ITEM_GAP}
-            snapToAlignment="start"
-            contentContainerStyle={{ paddingRight: ITEM_GAP }}
-            ItemSeparatorComponent={() => <View style={{ width: ITEM_GAP }} />}
-            renderItem={({ item }) => (
-              <View style={{ width: ITEM_W }}>
-                <Image
-                  source={typeof item === "string" ? { uri: item } : item}
-                  style={styles.photo}
+        {(shelter?.photos?.length ?? 0) > 0 && (
+          <View style={{ paddingHorizontal: H_PADDING }}>
+            <FlatList
+              data={shelter?.photos}
+              keyExtractor={(_, i) => String(i)}
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              decelerationRate="fast"
+              snapToInterval={ITEM_W + ITEM_GAP}
+              snapToAlignment="start"
+              contentContainerStyle={{ paddingRight: ITEM_GAP }}
+              ItemSeparatorComponent={() => (
+                <View style={{ width: ITEM_GAP }} />
+              )}
+              renderItem={({ item }) => (
+                <View style={{ width: ITEM_W }}>
+                  <Image
+                    source={typeof item === "string" ? { uri: item } : item}
+                    style={styles.photo}
+                  />
+                </View>
+              )}
+              onMomentumScrollEnd={(e) => {
+                const idx = Math.round(
+                  e.nativeEvent.contentOffset.x / (ITEM_W + ITEM_GAP)
+                );
+                setCurrent(idx);
+              }}
+            />
+            <View style={styles.pagination}>
+              {shelter?.photos!.map((_, i) => (
+                <View
+                  key={i}
+                  style={[styles.dot, i === current && styles.dotActive]}
                 />
-              </View>
-            )}
-            onMomentumScrollEnd={(e) => {
-              const idx = Math.round(
-                e.nativeEvent.contentOffset.x / (ITEM_W + ITEM_GAP)
-              );
-              setCurrent(idx);
-            }}
-          />
-          <View style={styles.pagination}>
-            {(shelter?.photos ?? []).map((_: string, i: number) => (
-              <View
-                key={i}
-                style={[styles.dot, i === current && styles.dotActive]}
-              />
-            ))}
+              ))}
+            </View>
           </View>
-        </View>
+        )}
 
         <View style={styles.line}></View>
 
-        {/* 주소/전화 */}
+        {/* 상세 정보 */}
         <View style={styles.infoBox}>
+          {/* 주소 */}
           <View style={styles.infoRow}>
             <MaterialIcons name="place" size={18} color="#475467" />
-            <Text style={styles.infoLabel}>주소</Text>
-            <Text style={styles.infoValue}>{shelter?.address ?? "-"}</Text>
-            {!!shelter?.address && (
-              <TouchableOpacity
-                style={styles.infoAction}
-                onPress={() => openMap(shelter.address!)}
-              >
-                <MaterialIcons name="map" size={18} color="#2563EB" />
-              </TouchableOpacity>
-            )}
-          </View>
-
-          <View style={styles.infoRow}>
-            <MaterialIcons name="call" size={18} color="#475467" />
-            <Text style={styles.infoLabel}>전화</Text>
-            <Text style={styles.infoValue}>{shelter?.phone ?? "-"}</Text>
-            {!!shelter?.phone && (
-              <TouchableOpacity
-                style={styles.infoAction}
-                onPress={() => openDial(shelter.phone!)}
-              >
-                <MaterialIcons name="phone" size={18} color="#2563EB" />
-              </TouchableOpacity>
-            )}
+            <Text style={styles.infoLabel}>주소:</Text>
+            <Text style={styles.infoValue}>{shelter?.roadAddress ?? "-"}</Text>
           </View>
 
           {/* 운영시간 */}
           <View style={styles.infoRow}>
             <MaterialIcons name="schedule" size={18} color="#475467" />
             <Text style={styles.infoLabel}>운영시간:</Text>
-            <Text style={styles.infoValue}>
-              {formatTodayHours(shelter?.schedule ?? ({} as Schedule))}
-            </Text>
+            <Text style={styles.infoValue}>{shelter?.time ?? "-"}</Text>
           </View>
-
-          {/* 이용 대상 */}
+          {/* 수용 인원 */}
           <View style={styles.infoRow}>
-            <MaterialIcons name="groups" size={18} color="#475467" />
-            <Text style={styles.infoLabel}>이용 대상:</Text>
-            <Text style={styles.infoValue}>
-              {(shelter?.eligibility?.groups || []).join(", ") || "-"}
-            </Text>
+            <MaterialIcons name="groups-2" size={18} color="#475467" />
+            <Text style={styles.infoLabel}>수용 인원:</Text>
+            <Text style={styles.infoValue}>{shelter?.capacity ?? "-"}</Text>
           </View>
-
-          {/* 이용 방법 */}
-          <View style={styles.infoRow}>
-            <MaterialIcons name="check-circle" size={18} color="#475467" />
-            <Text style={styles.infoLabel}>이용 방법:</Text>
-            <Text style={styles.infoValue}>{shelter?.usage?.howTo || "-"}</Text>
-          </View>
-
-          {/* 이용 절차 */}
-          <View style={styles.infoRow}>
-            <MaterialIcons
-              name="assignment-turned-in"
-              size={18}
-              color="#475467"
-            />
-            <Text style={styles.infoLabel}>이용 절차:</Text>
-            <Text style={styles.infoValue}>
-              {(shelter?.usage?.procedure || []).join(" → ") || "-"}
-            </Text>
-          </View>
-
           {/* 기타 */}
           <View style={styles.infoRow}>
             <MaterialIcons name="eco" size={18} color="#475467" />
             <Text style={styles.infoLabel}>기타:</Text>
-            <Text style={styles.infoValue}>{shelter?.notes || "-"}</Text>
+            <Text style={styles.infoValue}>{shelter?.note || "-"}</Text>
           </View>
         </View>
       </ScrollView>
