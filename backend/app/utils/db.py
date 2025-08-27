@@ -1,5 +1,4 @@
 # backend/app/utils/db.py
-# db를 실제로 연결하는 파일
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session
