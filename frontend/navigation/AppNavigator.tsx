@@ -20,7 +20,7 @@ export type RootStackParamList = {
   First: undefined;
   Permission: undefined;
   BottomTabs: { screen: "Home" | "Map" | "Settings" };
-  ShelterDetail: { shelterId: string }; // 필요하면 파라미터 타입 맞춰
+  ShelterDetail: { shelterId: string; table: string };
   Profile: undefined;
   Signup: undefined;
   Login: undefined;

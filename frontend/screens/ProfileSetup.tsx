@@ -41,7 +41,7 @@ export default function ProfileSetup() {
 
       console.log("회원가입 시도", payload);
       const response = await fetch(
-        "https://820e3c06e44d.ngrok-free.app/auth/signup",
+        "https://e80451de14f5.ngrok-free.app/auth/signup",
         {
           method: "POST",
           headers: {

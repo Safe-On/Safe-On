@@ -10,6 +10,8 @@ import {
 } from "./contexts/SeniorModeContext";
 import SeniorNavigator from "./navigation/SeniorNavigator";
 import { NavigationContainer } from "@react-navigation/native";
+import { AuthProvider } from "./screens/auth/AuthContext";
+
 
 SplashScreen.preventAutoHideAsync();
 
@@ -56,7 +58,7 @@ export default function App() {
 
 /*
 // 특정 스크린만 테스트 하고 싶은 경우, 아래 코드 수정해서 사용
-import "react-native-gesture-handler";
+
 import React from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { NavigationContainer } from "@react-navigation/native";
