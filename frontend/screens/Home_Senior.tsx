@@ -14,19 +14,34 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { Ionicons, FontAwesome, MaterialIcons } from "@expo/vector-icons";
 import { mockNotices } from "../data/mockNotices";
 import { mockWeather } from "../data/mockWeather";
-import SAdd from "./AddShelter_Senior";
-import { RootStackParamList } from "../App";
+import type {
+  SeniorHomeStackParamList,
+  SeniorTabParamList,
+} from "../navigation/SeniorBottomNavigator";
+import type { SeniorRootStackParamList } from "../navigation/SeniorAppNavigator";
+import type { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
 
-type NavigationProp = NativeStackNavigationProp<RootStackParamList, "Home">;
+type HomeNav = NativeStackNavigationProp<SeniorHomeStackParamList, "SHome">;
+type TabNav = BottomTabNavigationProp<SeniorTabParamList>;
+type RootNav = NativeStackNavigationProp<SeniorRootStackParamList>;
 
 
-export default function Home() {
+export default function Home_Senior() {
   const [rating, setRating] = useState<number>(0);
   const [congestion, setCongestion] = useState<string>();
   const [climateOption, setClimateOption] = useState<"on" | "off" | null>(null);
   const [accessLevel, setAccessLevel] = useState<string>();
   const [isScrolled, setIsScrolled] = useState(false);
-  const navigation = useNavigation<NavigationProp>();
+  const nav = useNavigation<HomeNav>();
+  const tabNav = useNavigation<TabNav>();
+  const rootNav = useNavigation<RootNav>();
+  const goAddShelter = () => nav.navigate("SAdd"); // 같은 스택
+
+  const goStar = () => tabNav.navigate("SSettingsTab", { screen: "SStar" });
+
+  const goDetail = () => {
+    rootNav.navigate("SShelterDetail", { shelterId: "123", table: "abc" });
+  };
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
@@ -65,7 +80,7 @@ export default function Home() {
           {/* 즐겨찾기 */}
           <TouchableOpacity
             style={styles.cardFav}
-            onPress={() => navigation.navigate("SStar")}
+            onPress={() => tabNav.navigate("SSettingsTab", { screen: "SStar" })}
             activeOpacity={0.7}
           >
             <FontAwesome name="star" size={100} color="#FFD700" />
@@ -227,7 +242,7 @@ export default function Home() {
       {/* 5. 플로팅 “쉼터 추가” 버튼 */}
       <TouchableOpacity
         style={styles.floatingBtn}
-        onPress={() => navigation.navigate("SAdd")}
+        onPress={() => nav.navigate("SAdd")}
       >
         <Ionicons name="add" size={40} color="#fff" />
         {!isScrolled && <Text style={styles.title}>쉼터추가</Text>}

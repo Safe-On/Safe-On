@@ -8,17 +8,18 @@ import {
   SeniorModeProvider,
   useSeniorMode,
 } from "./contexts/SeniorModeContext";
-import SeniorNavigator from "./navigation/SeniorNavigator";
+import SeniorNavigator from "./navigation/SeniorBottomNavigator";
 import { NavigationContainer } from "@react-navigation/native";
 import { AuthProvider } from "./screens/auth/AuthContext";
-
+import { SafeAreaProvider } from "react-native-safe-area-context";
+import SeniorAppNavigator from "./navigation/SeniorAppNavigator";
 
 SplashScreen.preventAutoHideAsync();
 
 function Root() {
   const { isSenior, loading } = useSeniorMode();
   if (loading) return null;
-  return isSenior ? <SeniorNavigator /> : <AppNavigator />;
+  return isSenior ? <SeniorAppNavigator /> : <AppNavigator />;
 }
 
 export default function App() {
@@ -48,9 +49,11 @@ export default function App() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }} onLayout={onLayoutRootView}>
       <SeniorModeProvider>
-        <NavigationContainer>
-          <Root />
-        </NavigationContainer>
+        <SafeAreaProvider>
+          <NavigationContainer>
+            <Root />
+          </NavigationContainer>
+        </SafeAreaProvider>
       </SeniorModeProvider>
     </GestureHandlerRootView>
   );
