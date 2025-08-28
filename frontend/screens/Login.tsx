@@ -13,11 +13,11 @@ import {
   TouchableWithoutFeedback,
 } from "react-native";
 import { useForm, Controller } from "react-hook-form";
+import { useAuth } from "./auth/AuthContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 //import { login as apiLogin } from "../services/api"; // 백엔드 api (없으면 모킹 가능)
 console.log("Hello");
-
 export default function Login({ navigation }: { navigation: any }) {
   const {
     control,
@@ -27,42 +27,31 @@ export default function Login({ navigation }: { navigation: any }) {
     defaultValues: { email: "", password: "" },
   });
 
+  const { signIn } = useAuth();
+
   const onSubmit = async (data: { email: string; password: string }) => {
     {/*
     // 백엔드 연동한 실제 사용 코드
     try {
-      const response = await fetch(
-        "https://e80451de14f5.ngrok-free.app/auth/login",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            email: data.email,
-            password: data.password,
-          }),
-        }
-      );
-
-      if (!response.ok) {
-        // 200번대 응답이 아니면 에러로 처리
-        const errorData = await response.json();
-        throw new Error(errorData.message || "로그인 실패");
+      const { email, password } = data;
+      if (!email || !password) {
+        throw new Error("이메일과 비밀번호를 입력해 주세요.");
       }
 
-      const res = await response.json();
+      // 컨텍스트가 fetch + 저장까지 처리
+      await signIn(email, password);
 
-      // 예: 서버에서 { token: "...", user: {...} } 형태로 반환한다고 가정
-
+      // 네 기존 플래그 유지하고 싶으면 그대로 둠(선택)
       await AsyncStorage.setItem("LoggedIn", "true");
 
+      // 네가 쓰던 네비게이션 형태 유지
       navigation.navigate("BottomTabs", { screen: "Home" });
-          
+      // 또는 더 깔끔한 전환을 원하면:
+      // navigation.reset({ index: 0, routes: [{ name: "BottomTabs", params: { screen: "Home" } }] });
     } catch (error: any) {
       Alert.alert(
         "로그인 실패",
-        error.message || "아이디나 비밀번호를 확인해 주세요."
+        error?.message || "아이디나 비밀번호를 확인해 주세요."
       );
     }
 */}
@@ -85,7 +74,6 @@ export default function Login({ navigation }: { navigation: any }) {
         error.message || "아이디나 비밀번호를 확인해 주세요."
       );
     }
-
   };
 
   return (
@@ -164,7 +152,6 @@ export default function Login({ navigation }: { navigation: any }) {
             <Text style={styles.linkText}>회원가입</Text>
           </TouchableOpacity>
           <Text style={styles.separator}>|</Text>
-          // cSpell:ignore Idpw
           <TouchableOpacity onPress={() => navigation.navigate("IdpwFind")}>
             <Text style={styles.linkText}>아이디/비밀번호 찾기</Text>
           </TouchableOpacity>
