@@ -5,6 +5,8 @@ from .db import db, init_db
 from .routers.auth import bp as auth_bp
 from .routers.shelters import bp as shelters_bp
 from .routers.reviews import bp as reviews_bp
+from .routers.addshelter import bp_shelter as addshelters_bp
+from .routers.favorites import bp as favorites_bp
 from .config import SQLALCHEMY_DATABASE_URI, SQLALCHEMY_TRACK_MODIFICATIONS
 
 def create_app():
@@ -29,9 +31,11 @@ def create_app():
     with app.app_context():
         db.create_all()
 
-    app.register_blueprint(auth_bp, url_prefix="/auth")
-    app.register_blueprint(shelters_bp)
-    app.register_blueprint(reviews_bp)
+    app.register_blueprint(auth_bp, url_prefix="/auth")  # 인증 기능
+    app.register_blueprint(shelters_bp)  # 쉼터 조회 기능 
+    app.register_blueprint(reviews_bp)   # 리뷰 기능
+    app.register_blueprint(addshelters_bp)  # 쉼터 추가 기능
+    app.register_blueprint(favorites_bp)    # 즐겨찾기 기능 
 
     return app
 
