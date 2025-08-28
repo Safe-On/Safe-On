@@ -10,7 +10,7 @@ def add_shelter():
     try:
         shelter_name = request.form.get("shelter_name")
         road_address = request.form.get("road_address")
-        facility_type = request.form.get("facility_type_2")  # 프론트에서 facility_type_2 보낸다면 여기 맞게 수정 필요
+        facility_type = request.form.get("facility_type")  # 프론트에서 facility_type_2 보낸다면 여기 맞게 수정 필요
         time = request.form.get("time")
         capacity = request.form.get("capacity")
         note = request.form.get("note")

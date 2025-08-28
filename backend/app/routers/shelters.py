@@ -58,6 +58,12 @@ def detail(table, shelter_id):
             FROM shelters_climate
             WHERE id = :id
             """
+    elif table=="extra":
+        query="""
+            SELECT id, shelter_name, road_address, facility_type, time, capacity, latitude, longitude, note
+            FROM shelters_extra
+            WHERE id = :id
+            """
     else:
         return jsonify({"error": "Invalid table"}),400
         
