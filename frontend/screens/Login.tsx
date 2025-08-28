@@ -16,6 +16,8 @@ import { useForm, Controller } from "react-hook-form";
 import { useAuth } from "./auth/AuthContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
+//import { login as apiLogin } from "../services/api"; // 백엔드 api (없으면 모킹 가능)
+console.log("Hello");
 export default function Login({ navigation }: { navigation: any }) {
   const {
     control,
@@ -28,6 +30,7 @@ export default function Login({ navigation }: { navigation: any }) {
   const { signIn } = useAuth();
 
   const onSubmit = async (data: { email: string; password: string }) => {
+    {/*
     // 백엔드 연동한 실제 사용 코드
     try {
       const { email, password } = data;
@@ -51,18 +54,17 @@ export default function Login({ navigation }: { navigation: any }) {
         error?.message || "아이디나 비밀번호를 확인해 주세요."
       );
     }
-    /*
+*/}
     // 백엔드 없이 테스트용 코드
+      
     try {
       // ✅ 여기부터는 테스트용 로직
       console.log("입력된 이메일:", data.email);
       console.log("입력된 비밀번호:", data.password);
-
       // 예시: 이메일과 비밀번호가 비어있지 않으면 로그인 성공으로 처리
       if (!data.email || !data.password) {
         throw new Error("이메일과 비밀번호를 입력해주세요.");
       }
-
       // AsyncStorage에 로그인 상태 저장
       await AsyncStorage.setItem("LoggedIn", "true");
       navigation.replace("BottomTabs", { screen: "Home" });
@@ -72,7 +74,6 @@ export default function Login({ navigation }: { navigation: any }) {
         error.message || "아이디나 비밀번호를 확인해 주세요."
       );
     }
-      */
   };
 
   return (

@@ -7,12 +7,12 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import type { RootStackParamList } from "../navigation/AppNavigator";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { MaterialIcons } from "@expo/vector-icons";
+import { useSeniorMode } from "../contexts/SeniorModeContext";
 
 export default function Settings_Senior() {
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
-  const [inSeniorMode, setInSeniorMode] = React.useState(false);
   const [ttsMode, setTtsMode] = React.useState(false);
   const [notificationMode, setNotificationMode] = React.useState(false);
   const [language, setLanguage] = React.useState("한국어");
@@ -20,6 +20,8 @@ export default function Settings_Senior() {
   const handleLanguageChange = () => {
     setLanguage((prev) => (prev === "한국어" ? "English" : "한국어"));
   };
+
+  const { isSenior, setSenior } = useSeniorMode();
 
   return (
     <SafeAreaView style={styles.SafeAreaView} edges={["top", "left", "right"]}>
@@ -50,7 +52,7 @@ export default function Settings_Senior() {
 
           <View style={styles.button}>
             <Text style={styles.buttonText}>시니어 모드</Text>
-            <ToggleButton value={inSeniorMode} onToggle={setInSeniorMode} />
+            <ToggleButton value={isSenior} onToggle={setSenior} />
           </View>
 
           <View style={styles.button}>
