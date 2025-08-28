@@ -11,14 +11,20 @@ import {
   TextInput,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { CompositeNavigationProp } from "@react-navigation/native";
+import type { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
+import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import type { TabParamList } from "../navigation/BottomTabNavigator";
+import type { RootStackParamList } from "../navigation/AppNavigator";
 import { Ionicons, FontAwesome, MaterialIcons } from "@expo/vector-icons";
 import { mockNotices } from "../data/mockNotices";
 import { mockWeather } from "../data/mockWeather";
 import AddShelter from "./AddShelter";
-import { RootStackParamList } from "../App";
 
-type NavigationProp = NativeStackNavigationProp<RootStackParamList, "Home">;
+type HomeNav = CompositeNavigationProp<
+  BottomTabNavigationProp<TabParamList, "Home">,
+  NativeStackNavigationProp<RootStackParamList>
+>;
 
 
 export default function Home() {
@@ -27,7 +33,7 @@ export default function Home() {
   const [climateOption, setClimateOption] = useState<"on" | "off" | null>(null);
   const [accessLevel, setAccessLevel] = useState<string>();
   const [isScrolled, setIsScrolled] = useState(false);
-  const navigation = useNavigation<NavigationProp>();
+  const navigation = useNavigation<HomeNav>();
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
@@ -223,7 +229,8 @@ export default function Home() {
         </View>
       </ScrollView>
 
-      {/* 5. 플로팅 “쉼터 추가” 버튼 */}
+      {/*
+      // 5. 플로팅 “쉼터 추가” 버튼 
       <TouchableOpacity
         style={styles.floatingBtn}
         onPress={() => navigation.navigate("AddShelter")}
@@ -231,6 +238,8 @@ export default function Home() {
         <Ionicons name="add" size={36} color="#fff" />
         {!isScrolled && <Text style={styles.title}>쉼터추가</Text>}
       </TouchableOpacity>
+      */}
+
     </SafeAreaView>
   );
 }
