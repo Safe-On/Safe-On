@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useMemo } from "react";
 import {
   View,
   Text,
@@ -19,7 +19,25 @@ import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../navigation/AppNavigator";
 import { KAKAO_REST_API_KEY } from "@env";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useAuth } from "./auth/AuthContext";
 
+const getRadiusForUser = (healthType?: number): number => {
+  const TYPE_BASE: Record<number, number> = {
+    1: 1500,
+    2: 500,
+    3: 2000,
+    4: 1500,
+    5: 2500,
+    6: 1500,
+    7: 2500,
+    8: 1500,
+    9: 3000,
+  };
+  let base = TYPE_BASE[healthType ?? 0] ?? 1500;
+
+  return base;
+};
 const CATEGORY_OPTIONS = [
   "전체",
   "경로당",
@@ -73,6 +91,12 @@ export default function Map() {
   const [places, setPlaces] = useState<PlaceType[]>([]);
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const { user } = useAuth();
+
+  const currentRadius = useMemo(
+    () => getRadiusForUser(Number(user?.health_type)),
+    [user?.health_type]
+  );
 
   // places를 selectedCategory 기준으로 필터링
   const filteredPlaces =
@@ -86,7 +110,7 @@ export default function Map() {
         const { status } = await Location.requestForegroundPermissionsAsync();
         if (status !== "granted") {
           alert("위치 권한이 필요합니다.");
-          fetchBackendPlaces(); // 권한 없으면 테스트 좌표로
+          await fetchBackendPlaces(undefined, undefined, currentRadius); // 권한 없으면 테스트 좌표로
           return;
         }
 
@@ -98,13 +122,17 @@ export default function Map() {
           longitudeDelta: 0.005,
         });
 
-        fetchBackendPlaces(loc.coords.latitude, loc.coords.longitude); // 실제 위치 기반
+        await fetchBackendPlaces(
+          loc.coords.latitude,
+          loc.coords.longitude,
+          currentRadius
+        ); // 실제 위치 기반
       } catch (err) {
         console.error("위치 가져오기 실패:", err);
-        fetchBackendPlaces(); // 오류 시 테스트 좌표로
+        await fetchBackendPlaces(undefined, undefined, currentRadius); // 오류 시 테스트 좌표로
       }
     })();
-  }, []);
+  }, [currentRadius]);
 
   /*
   // 검색 키워드가 변경되면 카카오 API를 호출 (카테고리 기능과 분리)
@@ -163,34 +191,63 @@ export default function Map() {
 
   // 백엔드 데이터 가져오기
   // fetchBackendPlaces 함수 수정
-  const fetchBackendPlaces = async (lat?: number, lng?: number) => {
+  // fetchBackendPlaces 함수 내부만 수정
+  const fetchBackendPlaces = async (
+    lat?: number,
+    lng?: number,
+    radiusOverride?: number
+  ) => {
     try {
       const useLat = lat ?? 37.5759;
       const useLng = lng ?? 126.9768;
 
       const kinds = ["heat", "climate", "smart", "finedust"];
+      const radius =
+        radiusOverride ?? getRadiusForUser(Number(user?.health_type));
 
       const res = await axios.get(
-        "https://e80451de14f5.ngrok-free.app/shelters/nearby",
+        "https://678281b933c5.ngrok-free.app/shelters/nearby",
         {
           params: {
             kinds: kinds.join(","),
             lat: useLat,
             lng: useLng,
-            radius: 3000,
-            limit: 20,
+            radius,
+            limit: 50, // 여유 있게 받아와도 아래서 필터
           },
         }
       );
+      console.log(
+        "health_type:",
+        user?.health_type,
+        "currentRadius:",
+        currentRadius
+      );
 
-      console.log("백엔드 데이터:", res.data);
+      console.log("백엔드 데이터 count:", res.data?.count, "radius:", radius);
 
-      const uniqueItems = uniqueByCoords(res.data.items);
+      const center = { latitude: useLat, longitude: useLng };
+      const items: BackendPlaceType[] = Array.isArray(res.data?.items)
+        ? res.data.items
+        : [];
 
-      const backendPlaces: BackendPlaceType[] = uniqueItems;
+      // 좌표 중복 제거
+      const uniqueItems = uniqueByCoords(items);
 
-      const converted: PlaceType[] = backendPlaces.map((p) => {
-        // p.props가 유효한지 확인하고 파싱
+      // ✅ 반경 필터(우선 서버가 준 distance_m 사용 → 없으면 클라에서 거리 재계산)
+      const withinRadius = uniqueItems.filter((it) => {
+        if (typeof it.distance_m === "number") {
+          return it.distance_m <= radius;
+        }
+        const d = getDistance(center, {
+          latitude: it.latitude,
+          longitude: it.longitude,
+        });
+        return d <= radius;
+      });
+
+      // 변환
+      const converted: PlaceType[] = withinRadius.map((p) => {
         let propsObj: any = {};
         if (p.props && typeof p.props === "string") {
           try {
@@ -220,7 +277,7 @@ export default function Map() {
           address_name: propsObj.road_address || "주소 없음",
           x: p.longitude.toString(),
           y: p.latitude.toString(),
-          category: category,
+          category,
           kind: p.kind,
         };
       });

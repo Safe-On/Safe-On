@@ -6,11 +6,11 @@ type Props = {
   onToggle: (newValue: boolean) => void;
 };
 export default function ToggleButton({ value, onToggle }: Props) {
-  const animation = useRef(new Animated.Value(0)).current;
+  const animation = useRef(new Animated.Value(value ? 1 : 0)).current;
 
   useEffect(() => {
     Animated.timing(animation, {
-      toValue: value ? 0 : 1,
+      toValue: value ? 1 : 0,
       duration: 200,
       useNativeDriver: false,
     }).start();

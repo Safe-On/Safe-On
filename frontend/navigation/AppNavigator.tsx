@@ -1,6 +1,5 @@
 // navigation/AppNavigator.tsx
 import React from "react";
-import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
 import BottomTabNavigator from "./BottomTabNavigator"; // 경로 확인
@@ -13,8 +12,6 @@ import Login from "../screens/Login";
 import AddShelter from "../screens/AddShelter";
 import ProfileSetup from "../screens/ProfileSetup";
 import Star from "../screens/Star";
-import Star_Senior from "../screens/Star_Senior";
-import SProfile from "../screens/Profile_Senior";
 
 export type RootStackParamList = {
   First: undefined;
@@ -27,15 +24,12 @@ export type RootStackParamList = {
   AddShelter: { lat: number; lng: number };
   ProfileSetup: { email: string; password: string };
   Star: undefined;
-  Star_Senior: undefined;
-  SProfile: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 console.log("Hello");
 export default function AppNavigator() {
   return (
-    <NavigationContainer>
       <Stack.Navigator
         initialRouteName="First"
         screenOptions={{ headerShown: false }}
@@ -50,9 +44,6 @@ export default function AppNavigator() {
         <Stack.Screen name="AddShelter" component={AddShelter} />
         <Stack.Screen name="ProfileSetup" component={ProfileSetup} />
         <Stack.Screen name="Star" component={Star} />
-        <Stack.Screen name="Star_Senior" component={Star_Senior} />
-        <Stack.Screen name="SProfile" component={SProfile} />
       </Stack.Navigator>
-    </NavigationContainer>
   );
 }
