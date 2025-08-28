@@ -5,6 +5,7 @@ from .db import db, init_db
 from .routers.auth import bp as auth_bp
 from .routers.shelters import bp as shelters_bp
 from .routers.reviews import bp as reviews_bp
+from .routers.favorites import bp as favorites_bp
 from .config import SQLALCHEMY_DATABASE_URI, SQLALCHEMY_TRACK_MODIFICATIONS
 
 def create_app():
@@ -32,6 +33,7 @@ def create_app():
     app.register_blueprint(auth_bp, url_prefix="/auth")
     app.register_blueprint(shelters_bp)
     app.register_blueprint(reviews_bp)
+    app.register_blueprint(favorites_bp)
 
     return app
 
