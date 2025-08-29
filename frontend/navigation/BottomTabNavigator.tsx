@@ -8,7 +8,7 @@ import { Ionicons } from "@expo/vector-icons";
 import type { RouteProp } from "@react-navigation/native";
 import type { BottomTabNavigationOptions } from "@react-navigation/bottom-tabs";
 
-type TabParamList = {
+export type TabParamList = {
   Map: undefined;
   Home: undefined;
   Settings: undefined;
