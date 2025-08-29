@@ -84,33 +84,60 @@ export default function AddShelter() {
       return;
     }
     const formData = new FormData();
-    formData.append("facility_type_2", facilityType);
-    formData.append("shelter_name", shelterName);
-    formData.append("road_address", roadAddress);
-    formData.append("time", time);
-    formData.append("capacity", capacity);
-    formData.append("note", note);
+    if (facilityType.trim())
+      formData.append("facility_type", facilityType.trim());
+    formData.append("shelter_name", shelterName.trim());
+    if (roadAddress.trim()) formData.append("road_address", roadAddress.trim());
+    if (time.trim()) formData.append("time", time.trim());
+    if (capacity.trim()) formData.append("capacity", capacity.trim()); // 서버에서 숫자로 파싱
+    if (note.trim()) formData.append("note", note.trim());
+
     formData.append("lat", String(lat));
     formData.append("lng", String(lng));
-    photos.forEach((uri, index) => {
-      formData.append("photos", {
-        uri,
-        type: "image/jpeg", // PNG면 "image/png"
-        name: `photo_${index}.jpg`,
-      } as any);
-    });
-    try {
-      const response = await fetch("http://<서버주소>/add_shelter", {
-        method: "POST",
-        body: formData,
+
+    // 📌 사진은 있을 때만 append (옵션)
+    if (photos.length > 0) {
+      photos.forEach((uri, index) => {
+        formData.append("photos", {
+          uri,
+          name: `photo_${index}.jpg`,
+          type: "image/jpeg",
+        } as any);
+        // 서버가 photos[]를 요구하면 키를 "photos[]"로 바꾸세요.
       });
-      const result = await response.json();
-      console.log("서버 응답:", result);
-      alert("저장 완료!");
-      navigation.navigate("Map");
-    } catch (error) {
-      console.error("업로드 에러:", error);
-      alert("업로드 실패");
+    }
+
+    try {
+      const response = await fetch(
+        "https://a2a1f1492028.ngrok-free.app/add_shelter",
+        {
+          method: "POST",
+          headers: { Accept: "application/json" }, // Content-Type은 지정하지 않기!
+          body: formData,
+        }
+      );
+
+      const ct = response.headers.get("content-type") || "";
+      if (!response.ok) {
+        const text = await response.text();
+        console.error(`업로드 실패 ${response.status}\n${text}`);
+        alert(`업로드 실패(${response.status})`);
+        return;
+      }
+
+      if (ct.includes("application/json")) {
+        const result = await response.json();
+        console.log("서버 응답:", result);
+        alert("저장 완료!");
+        navigation.goBack();
+      } else {
+        const text = await response.text();
+        console.error("JSON 아님, 서버 응답:", text);
+        alert("서버가 JSON이 아닌 응답을 보냈어요(콘솔 참고).");
+      }
+    } catch (e) {
+      console.error("업로드 에러:", e);
+      alert("업로드 중 오류");
     }
   };
 
@@ -180,6 +207,7 @@ export default function AddShelter() {
                 value={time}
                 onChangeText={setTime}
                 placeholder="00:00"
+                autoCapitalize="none"
               />
               {/* 5. 수용인원 */}
               <Text style={styles.label}>수용인원</Text>
@@ -188,6 +216,7 @@ export default function AddShelter() {
                 value={capacity}
                 onChangeText={setCapacity}
                 placeholder="인원수 입력"
+                keyboardType="number-pad"
               />
               {/* 6. 상세내용 */}
               <Text style={styles.label}>상세 내용</Text>

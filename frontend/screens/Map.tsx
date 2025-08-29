@@ -9,7 +9,7 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import MapView, { Marker } from "react-native-maps";
+import MapView, { Callout, CalloutSubview, Marker } from "react-native-maps";
 import * as Location from "expo-location";
 import * as Haptics from "expo-haptics";
 import axios from "axios";
@@ -92,17 +92,63 @@ export default function Map() {
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const { user } = useAuth();
+  const [backendPlaces, setBackendPlaces] = useState<PlaceType[]>([]);
+  const [ignoreRadius, setIgnoreRadius] = useState(false);
+
+  const firstOpenRef = useRef(false);
 
   const currentRadius = useMemo(
     () => getRadiusForUser(Number(user?.health_type)),
     [user?.health_type]
   );
+  const placeKey = (p: PlaceType) => `${p.kind}:${p.id}:${p.x}:${p.y}`;
+
+  const [debouncedKeyword, setDebouncedKeyword] = useState("");
+  useEffect(() => {
+    const t = setTimeout(() => setDebouncedKeyword(keyword), 150);
+    return () => clearTimeout(t);
+  }, [keyword]);
+  const normalize = (s?: string) =>
+    (s ?? "")
+      .toLowerCase()
+      .normalize("NFC") // 한글 정규화
+      .replace(/\s+/g, "") // 공백 제거
+      .replace(/[·.,()\-_/]/g, ""); // 흔한 구분자 제거
+
+  const matchesKeyword = (p: PlaceType, kw: string) => {
+    if (!kw.trim()) return true;
+    const tokens = kw.split(/\s+/).map(normalize).filter(Boolean);
+    if (!tokens.length) return true;
+
+    const hay = normalize(`${p.place_name} ${p.address_name}`);
+    // 모든 토큰 AND 매칭
+    return tokens.every((t) => hay.includes(t));
+  };
+  // 검색어가 생기면 반경 크게 요청 (예: 100km)
+  // 검색어 없으면 원래대로 사용자 반경 요청
+  useEffect(() => {
+    if (!region) return;
+
+    const wantAll = debouncedKeyword.trim().length > 0;
+    fetchBackendPlaces(
+      region.latitude,
+      region.longitude,
+      wantAll ? 100_000 : currentRadius
+    );
+  }, [debouncedKeyword, region, currentRadius]);
 
   // places를 selectedCategory 기준으로 필터링
-  const filteredPlaces =
-    selectedCategory && selectedCategory !== "전체"
-      ? places.filter((p) => p.category === selectedCategory)
-      : places;
+  const filteredPlaces = useMemo(() => {
+    const base = backendPlaces; // 항상 백엔드 원본만 기반으로
+
+    const byCategory =
+      selectedCategory && selectedCategory !== "전체"
+        ? base.filter((p) => p.category === selectedCategory)
+        : base;
+
+    return byCategory.filter((p) => matchesKeyword(p, debouncedKeyword));
+  }, [backendPlaces, selectedCategory, debouncedKeyword]);
+
   // 초기 마운트 시 위치 권한 요청 및 백엔드 데이터 불러오기
   useEffect(() => {
     (async () => {
@@ -134,50 +180,6 @@ export default function Map() {
     })();
   }, [currentRadius]);
 
-  /*
-  // 검색 키워드가 변경되면 카카오 API를 호출 (카테고리 기능과 분리)
-  useEffect(() => {
-    if (!region || !keyword.trim()) return;
-    searchPlacesKakao(region.latitude, region.longitude, keyword);
-  }, [keyword, region]);
-
-  // 카카오 장소 검색
-  const searchPlacesKakao = async (lat: number, lng: number, query: string) => {
-    setLoading(true);
-    try {
-      const res = await axios.get(
-        "https://dapi.kakao.com/v2/local/search/keyword.json",
-        {
-          params: {
-            query: query,
-            x: lng.toString(),
-            y: lat.toString(),
-            radius: 3000,
-            sort: "distance",
-          },
-          headers: {
-            Authorization: `KakaoAK ${KAKAO_REST_API_KEY}`,
-          },
-        }
-      );
-
-      const filtered = res.data.documents.filter((place: PlaceType) => {
-        const dist = getDistance(
-          { latitude: lat, longitude: lng },
-          { latitude: parseFloat(place.y), longitude: parseFloat(place.x) }
-        );
-        return dist <= 3000;
-      });
-
-      setPlaces(filtered);
-      setLoading(false);
-      modalRef.current?.open();
-    } catch (err) {
-      console.error("카카오 검색 실패:", err);
-      setLoading(false);
-    }
-  };
-*/
   // 중복 장소 제거
   const uniqueByCoords = (items: BackendPlaceType[]) => {
     const seen = new Set();
@@ -189,9 +191,16 @@ export default function Map() {
     });
   };
 
-  // 백엔드 데이터 가져오기
-  // fetchBackendPlaces 함수 수정
-  // fetchBackendPlaces 함수 내부만 수정
+  // 👇 유틸(파일 상단 아무데나)
+  const countBy = <T extends string | number>(arr: any[], key: (v: any) => T) =>
+    arr.reduce<Record<T, number>>((acc, it) => {
+      const k = key(it);
+      acc[k] = (acc[k] ?? 0) + 1;
+      return acc;
+    }, {} as any);
+
+  // 백엔드 데이터 가져오기 (반경 제한을 서버요청 단계에서 제어하고,
+  // 클라이언트에서는 반경 필터를 하지 않음)
   const fetchBackendPlaces = async (
     lat?: number,
     lng?: number,
@@ -201,53 +210,64 @@ export default function Map() {
       const useLat = lat ?? 37.5759;
       const useLng = lng ?? 126.9768;
 
-      const kinds = ["heat", "climate", "smart", "finedust"];
-      const radius =
+      const kinds = ["heat", "climate", "smart", "finedust", "extra"];
+
+      // 사용자 기본 반경
+      const userRadius =
         radiusOverride ?? getRadiusForUser(Number(user?.health_type));
 
+      // ⬇️ 반경 무시 모드거나 검색 중이면 서버 요청 radius를 크게 준다(예: 100km)
+      //    그렇지 않으면 기존 사용자 반경 사용
+      const requestRadius = radiusOverride ?? userRadius;
+
       const res = await axios.get(
-        "https://678281b933c5.ngrok-free.app/shelters/nearby",
+        "https://a2a1f1492028.ngrok-free.app/shelters/nearby",
         {
           params: {
             kinds: kinds.join(","),
             lat: useLat,
             lng: useLng,
-            radius,
-            limit: 50, // 여유 있게 받아와도 아래서 필터
+            radius: requestRadius,
+            limit: 200, // 넉넉히 받아서 클라에서 카테고리/검색만 필터
           },
         }
       );
+
       console.log(
+        "age:",
+        user?.age,
         "health_type:",
         user?.health_type,
-        "currentRadius:",
-        currentRadius
+        "currentRadius(user):",
+        userRadius,
+        "requestRadius(sent):",
+        requestRadius
       );
 
-      console.log("백엔드 데이터 count:", res.data?.count, "radius:", radius);
-
-      const center = { latitude: useLat, longitude: useLng };
       const items: BackendPlaceType[] = Array.isArray(res.data?.items)
         ? res.data.items
         : [];
 
+      console.log("[A] 원본 총개수:", items.length);
+      console.log(
+        "[A] kind별:",
+        countBy(items, (it) => it.kind)
+      );
+
       // 좌표 중복 제거
       const uniqueItems = uniqueByCoords(items);
 
-      // ✅ 반경 필터(우선 서버가 준 distance_m 사용 → 없으면 클라에서 거리 재계산)
-      const withinRadius = uniqueItems.filter((it) => {
-        if (typeof it.distance_m === "number") {
-          return it.distance_m <= radius;
-        }
-        const d = getDistance(center, {
-          latitude: it.latitude,
-          longitude: it.longitude,
-        });
-        return d <= radius;
-      });
+      console.log("[B] dedup 후 총개수:", uniqueItems.length);
+      console.log(
+        "[B] kind별:",
+        countBy(uniqueItems, (it) => it.kind)
+      );
 
-      // 변환
-      const converted: PlaceType[] = withinRadius.map((p) => {
+      // ⚠️ 여기서 더 이상 '반경 필터'는 하지 않음!
+      // 클라이언트에서 filteredPlaces(useMemo)로 카테고리/검색/반경을 제어하려면
+      // 풀 데이터(중복 제거만 한 상태)를 변환해서 상태에 저장한다.
+
+      const convertedAll: PlaceType[] = uniqueItems.map((p) => {
         let propsObj: any = {};
         if (p.props && typeof p.props === "string") {
           try {
@@ -270,6 +290,7 @@ export default function Map() {
         else if (name.includes("은행")) category = "은행";
         else if (name.includes("편의점")) category = "편의점";
         else if (name.includes("그늘막")) category = "그늘막";
+        else category = "기타";
 
         return {
           id: p.id,
@@ -282,8 +303,22 @@ export default function Map() {
         };
       });
 
-      setPlaces(converted);
-      modalRef.current?.open();
+      console.log("[C] 변환 후 총개수:", convertedAll.length);
+      console.log(
+        "[C] kind별:",
+        countBy(convertedAll, (it) => it.kind)
+      );
+
+      // ✅ 풀 데이터 저장: 이후 UI는 filteredPlaces(useMemo)로 카테고리/검색/반경 토글 적용
+      setBackendPlaces(convertedAll);
+
+      // (마커/카운트가 places를 참조한다면 초기 표시를 위해 동기화)
+      setPlaces(convertedAll);
+
+      if (!firstOpenRef.current) {
+        modalRef.current?.open();
+        firstOpenRef.current = true; // 다시는 자동 오픈 안 함
+      }
     } catch (err) {
       console.error("백엔드 장소 가져오기 실패:", err);
     }
@@ -335,17 +370,39 @@ export default function Map() {
             title="내 위치"
             pinColor="blue"
           />
-          {places.map((place) => (
+          {filteredPlaces.map((place) => (
             <Marker
-              key={place.id}
+              key={placeKey(place)}
               coordinate={{
                 latitude: parseFloat(place.y),
                 longitude: parseFloat(place.x),
               }}
-              title={place.place_name}
-              description={place.address_name}
               pinColor="green"
-            />
+            >
+              <Callout tooltip>
+                <View
+                  style={{
+                    padding: 8,
+                    backgroundColor: "#fff",
+                    borderRadius: 8,
+                  }}
+                >
+                  <Text>{place.place_name}</Text>
+                  <Text>{place.address_name}</Text>
+                  <CalloutSubview
+                    onPress={() =>
+                      navigation.navigate("ShelterDetail", {
+                        shelterId: place.id,
+                        table: place.kind,
+                      })
+                    }
+                    style={styles.calloutBtn}
+                  >
+                    <Text style={{ color: "#fff" }}>상세보기</Text>
+                  </CalloutSubview>
+                </View>
+              </Callout>
+            </Marker>
           ))}
           {selectedCoord && (
             <Marker
@@ -416,7 +473,7 @@ export default function Map() {
         >
           <Text>{selectedCategory ?? "이용 시설"}</Text>
         </Pressable>
-        <Text>{places.length}개의 결과</Text>
+        <Text>{filteredPlaces.length}개의 결과</Text>
       </View>
 
       {/* 바텀시트 */}
@@ -436,7 +493,7 @@ export default function Map() {
           nestedScrollEnabled: true,
           scrollEnabled: true,
           keyboardShouldPersistTaps: "handled",
-          keyExtractor: (item) => item.id,
+          keyExtractor: (item) => placeKey(item),
           renderItem: ({ item }) => (
             <View
               style={{
@@ -592,6 +649,14 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 8 },
     shadowRadius: 3,
     elevation: 3,
+  },
+  calloutBtn: {
+    backgroundColor: "#34A853",
+    marginTop: 12,
+    padding: 6,
+    borderRadius: 8,
+    width: 70,
+    alignItems: "center",
   },
   buttonTextStyle: { fontSize: 13, color: "#333", textAlign: "center" },
   resultCount: { fontSize: 13, alignSelf: "center" },

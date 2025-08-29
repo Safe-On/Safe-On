@@ -4,7 +4,7 @@ import type { ImageSourcePropType } from "react-native";
 export interface ApiShelter {
   id: string;
   shelter_name?: string | null;
-  facility_type_2?: string | null;
+  facility_type?: string | null;
   road_address?: string | null;
   time?: string | null;
   capacity?: string | null;

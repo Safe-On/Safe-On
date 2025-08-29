@@ -3,7 +3,7 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 import * as SecureStore from "expo-secure-store";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const BASE_URL = "https://678281b933c5.ngrok-free.app"; // ← 서버 주소
+const BASE_URL = "https://a2a1f1492028.ngrok-free.app"; // ← 서버 주소
 
 type User = {
   id: number;
@@ -109,8 +109,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   // (B) 이미 받은 로그인 응답을 상태/저장에 반영
+  // AuthContext.tsx
   const acceptLogin = async ({
-    token: tk = null,
+    token: tk, // 기본값 제거
     user: usr,
   }: {
     token?: string | null;
@@ -119,12 +120,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setUser(usr);
     await AsyncStorage.setItem(USER_KEY, JSON.stringify(usr));
 
-    if (tk) {
-      setToken(String(tk));
-      await SecureStore.setItemAsync(TOKEN_KEY, String(tk));
-    } else {
-      setToken(null);
-      await SecureStore.deleteItemAsync(TOKEN_KEY).catch(() => {});
+    // 🔑 포인트: tk가 undefined일 땐 기존 토큰 유지
+    if (tk !== undefined) {
+      if (tk) {
+        setToken(String(tk));
+        await SecureStore.setItemAsync(TOKEN_KEY, String(tk));
+      } else {
+        setToken(null);
+        await SecureStore.deleteItemAsync(TOKEN_KEY).catch(() => {});
+      }
     }
   };
 

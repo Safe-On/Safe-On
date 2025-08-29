@@ -2,13 +2,14 @@
 import type { ApiShelter, Shelter } from "../types/shelter";
 import type { ImageURISource } from "react-native";
 
-type Table = "heat" | "smart" | "finedust" | "climate";
+type Table = "heat" | "smart" | "finedust" | "climate" | "extra";
 
 const tableToType: Record<Table, string> = {
   heat: "무더위 쉼터",
   smart: "스마트 쉼터",
   finedust: "미세먼지 쉼터",
   climate: "기후쉼터",
+  extra: "기타 쉼터",
 };
 
 export function mapApiShelter(s: ApiShelter, table?: Table): Shelter {

@@ -25,7 +25,7 @@ const H_PADDING = 20;
 const ITEM_GAP = 12;
 const ITEM_W = SCREEN_W - H_PADDING * 2;
 
-const BASE_URL = "https://e80451de14f5.ngrok-free.app";
+const BASE_URL = "https://a2a1f1492028.ngrok-free.app";
 
 export default function ShelterDetail() {
   const navigation = useNavigation();
@@ -203,7 +203,6 @@ export default function ShelterDetail() {
             <Text style={styles.infoLabel}>주소:</Text>
             <Text style={styles.infoValue}>{shelter?.roadAddress ?? "-"}</Text>
           </View>
-
           {/* 운영시간 */}
           <View style={styles.infoRow}>
             <MaterialIcons name="schedule" size={18} color="#475467" />
