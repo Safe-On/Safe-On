@@ -48,7 +48,7 @@ def login():
     return jsonify({
         "access_token": create_access_token(user.id),
         "refresh_token": create_refresh_token(user.id),
-        "user": {"id": user.id, "email": user.email, "name": getattr(user, "name", None)}
+        "user": {"id": user.id, "email": user.email, "age": user.age, "health_type": user.health_type}
     }), 200
 
 @bp.get("/me")
@@ -56,7 +56,7 @@ def login():
 def me():
     uid = get_current_user_id()
     u = sa_db.session.get(User, uid)
-    return jsonify({"id": u.id, "email": u.email, "name": getattr(u, "name", None)})
+    return jsonify({"id": u.id, "email": u.email, "age": u.age, "health_type": u.health_type})
 
 @bp.post("/refresh")
 def refresh():
