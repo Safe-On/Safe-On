@@ -3,7 +3,7 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 import * as SecureStore from "expo-secure-store";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const BASE_URL = "https://a2a1f1492028.ngrok-free.app"; // ← 서버 주소
+const BASE_URL = "https://3ea2c99591da.ngrok-free.app"; // ← 서버 주소
 
 type User = {
   id: number;

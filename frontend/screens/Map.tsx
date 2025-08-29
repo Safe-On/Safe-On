@@ -221,7 +221,7 @@ export default function Map() {
       const requestRadius = radiusOverride ?? userRadius;
 
       const res = await axios.get(
-        "https://a2a1f1492028.ngrok-free.app/shelters/nearby",
+        "https://3ea2c99591da.ngrok-free.app/shelters/nearby",
         {
           params: {
             kinds: kinds.join(","),
@@ -379,27 +379,27 @@ export default function Map() {
               }}
               pinColor="green"
             >
-              <Callout tooltip>
+              <Callout
+                tooltip
+                onPress={() =>
+                  navigation.navigate("ShelterDetail", {
+                    shelterId: place.id,
+                    table: place.kind,
+                  })
+                }
+              >
                 <View
                   style={{
                     padding: 8,
                     backgroundColor: "#fff",
                     borderRadius: 8,
+                    width: 240,
                   }}
                 >
-                  <Text>{place.place_name}</Text>
-                  <Text>{place.address_name}</Text>
-                  <CalloutSubview
-                    onPress={() =>
-                      navigation.navigate("ShelterDetail", {
-                        shelterId: place.id,
-                        table: place.kind,
-                      })
-                    }
-                    style={styles.calloutBtn}
-                  >
-                    <Text style={{ color: "#fff" }}>상세보기</Text>
-                  </CalloutSubview>
+                  <Text style={{ fontWeight: "bold" }} numberOfLines={1}>
+                    {place.place_name}
+                  </Text>
+                  <Text numberOfLines={1}>{place.address_name}</Text>
                 </View>
               </Callout>
             </Marker>
@@ -649,14 +649,6 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 8 },
     shadowRadius: 3,
     elevation: 3,
-  },
-  calloutBtn: {
-    backgroundColor: "#34A853",
-    marginTop: 12,
-    padding: 6,
-    borderRadius: 8,
-    width: 70,
-    alignItems: "center",
   },
   buttonTextStyle: { fontSize: 13, color: "#333", textAlign: "center" },
   resultCount: { fontSize: 13, alignSelf: "center" },

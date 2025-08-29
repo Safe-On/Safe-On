@@ -25,7 +25,7 @@ const H_PADDING = 20;
 const ITEM_GAP = 12;
 const ITEM_W = SCREEN_W - H_PADDING * 2;
 
-const BASE_URL = "https://a2a1f1492028.ngrok-free.app";
+const BASE_URL = "https://3ea2c99591da.ngrok-free.app";
 
 export default function ShelterDetail() {
   const navigation = useNavigation();

@@ -109,7 +109,7 @@ export default function AddShelter() {
 
     try {
       const response = await fetch(
-        "https://a2a1f1492028.ngrok-free.app/add_shelter",
+        "https://3ea2c99591da.ngrok-free.app/add_shelter",
         {
           method: "POST",
           headers: { Accept: "application/json" }, // Content-Type은 지정하지 않기!

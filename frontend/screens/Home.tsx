@@ -31,7 +31,7 @@ type HomeNav = CompositeNavigationProp<
 >;
 
 /* --------------------- 공통 fetch 헬퍼 --------------------- */
-const API_BASE_URL = "https://a2a1f1492028.ngrok-free.app";
+const API_BASE_URL = "https://3ea2c99591da.ngrok-free.app";
 const TOKEN_KEY = "auth_token";
 const REFRESH_TOKEN_KEY = "refresh_token";
 
@@ -142,7 +142,7 @@ export default function Home() {
       subHide.remove();
     };
   }, []);
-  
+
   /* ------------------------------ 함수 ------------------------------ */
   // 이름으로 쉼터 검색
   const searchShelters = useCallback(async (q: string) => {
